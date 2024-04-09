@@ -313,7 +313,7 @@ for fold_id in range(n_folds):
             print(
                 'Test set (epoch {}): Average loss: {:.4f}, Accuracy: ({:.2f}%), Recall: ({:.2f}%), Precision: ({:.2f}%), '
                 'F1-Score: ({:.2f}%),  sec/iter: {:.4f}\n'.format(
-                    epoch + 1, test_loss / n_samples, accuracy, recall, precision, F1, FPR,
+                    epoch + 1, test_loss / n_samples, accuracy, recall, precision, F1,
                     (time.time() - start) / len(test_loader))
             )
 
