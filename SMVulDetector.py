@@ -306,14 +306,14 @@ for fold_id in range(n_folds):
             recall = metrics.recall_score(data[4], pred.view_as(data[4]))
             precision = metrics.precision_score(data[4], pred.view_as(data[4]))
             F1 = metrics.f1_score(data[4], pred.view_as(data[4]))
-
+            FPR = fp / (fp + tn)
             print(tp, fp, tn, fn)
 
 
             print(
                 'Test set (epoch {}): Average loss: {:.4f}, Accuracy: ({:.2f}%), Recall: ({:.2f}%), Precision: ({:.2f}%), '
-                'F1-Score: ({:.2f}%),  sec/iter: {:.4f}\n'.format(
-                    epoch + 1, test_loss / n_samples, accuracy, recall, precision, F1,
+                'F1-Score: ({:.2f}%), FPR: ({:.2f}%)  sec/iter: {:.4f}\n'.format(
+                    epoch + 1, test_loss / n_samples, accuracy, recall, precision, F1, FPR,
                     (time.time() - start) / len(test_loader))
             )
 
