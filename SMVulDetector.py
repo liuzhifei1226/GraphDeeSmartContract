@@ -239,8 +239,8 @@ for fold_id in range(n_folds):
             for i in range(len(data)):
                 data[i] = data[i].to(args.device)
             optimizer.zero_grad()
-            # output = model(training_data[0], training_data[1])  # when model is gcn_origin or gat, use this
-            output = model(data)  # when model is gcn_modify, use this
+            output = model(data[0], data[1])  # when model is gcn_origin or gat, use this
+            #output = model(data)  # when model is gcn_modify, use this
             loss = loss_fn(output, data[4])
             loss.backward()
             optimizer.step()
@@ -266,8 +266,8 @@ for fold_id in range(n_folds):
         for batch_idx, data in enumerate(test_loader):
             for i in range(len(data)):
                 data[i] = data[i].to(args.device)
-            # output = model(training_data[0], training_data[1])  # when model is gcn_origin or gat, use this
-            output = model(data)  # when model is gcn_modify, use this
+            output = model(data[0], data[1])  # when model is gcn_origin or gat, use this
+            #output = model(data)  # when model is gcn_modify, use this
             loss = loss_fn(output, data[4], reduction='sum')
             test_loss += loss.item()
             n_samples += len(output)
