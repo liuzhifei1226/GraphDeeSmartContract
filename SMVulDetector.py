@@ -297,25 +297,38 @@ for fold_id in range(n_folds):
                     fp += 1
                     fp_list.append(np.array(data[5].detach().cpu()[k]).tolist())
                     continue
+            # accuracy += metrics.accuracy_score(data[4], pred.view_as(data[4]))
+            # recall += metrics.recall_score(data[4], pred.view_as(data[4]))
+            # precision += metrics.precision_score(data[4], pred.view_as(data[4]))
+            # F1 += metrics.f1_score(data[4], pred.view_as(data[4]))
+            accuracy = metrics.accuracy_score(data[4], pred.view_as(data[4]))
+            recall = metrics.recall_score(data[4], pred.view_as(data[4]))
+            precision = metrics.precision_score(data[4], pred.view_as(data[4]))
+            F1 = metrics.f1_score(data[4], pred.view_as(data[4]))
 
-            accuracy += metrics.accuracy_score(data[4], pred.view_as(data[4]))
-            recall += metrics.recall_score(data[4], pred.view_as(data[4]))
-            precision += metrics.precision_score(data[4], pred.view_as(data[4]))
-            F1 += metrics.f1_score(data[4], pred.view_as(data[4]))
+            print(tp, fp, tn, fn)
 
-        print(tp, fp, tn, fn)
-        accuracy = 100. * accuracy / count
-        recall = 100. * recall / count
-        precision = 100. * precision / count
-        F1 = 100. * F1 / count
-        FPR = fp / (fp + tn)
 
-        print(
-            'Test set (epoch {}): Average loss: {:.4f}, Accuracy: ({:.2f}%), Recall: ({:.2f}%), Precision: ({:.2f}%), '
-            'F1-Score: ({:.2f}%), FPR: ({:.2f}%)  sec/iter: {:.4f}\n'.format(
-                epoch + 1, test_loss / n_samples, accuracy, recall, precision, F1, FPR,
-                (time.time() - start) / len(test_loader))
-        )
+            print(
+                'Test set (epoch {}): Average loss: {:.4f}, Accuracy: ({:.2f}%), Recall: ({:.2f}%), Precision: ({:.2f}%), '
+                'F1-Score: ({:.2f}%), FPR: ({:.2f}%)  sec/iter: {:.4f}\n'.format(
+                    epoch + 1, test_loss / n_samples, accuracy, recall, precision, F1, FPR,
+                    (time.time() - start) / len(test_loader))
+            )
+
+        # print(tp, fp, tn, fn)
+        # accuracy = 100. * accuracy / count
+        # recall = 100. * recall / count
+        # precision = 100. * precision / count
+        # F1 = 100. * F1 / count
+        # FPR = fp / (fp + tn)
+        #
+        # print(
+        #     'Test set (epoch {}): Average loss: {:.4f}, Accuracy: ({:.2f}%), Recall: ({:.2f}%), Precision: ({:.2f}%), '
+        #     'F1-Score: ({:.2f}%), FPR: ({:.2f}%)  sec/iter: {:.4f}\n'.format(
+        #         epoch + 1, test_loss / n_samples, accuracy, recall, precision, F1, FPR,
+        #         (time.time() - start) / len(test_loader))
+        # )
 
         print("fn_list(predict == 0 & label == 1):", fn_list)
         print("fp_list(predict == 1 & label == 0):", fp_list)

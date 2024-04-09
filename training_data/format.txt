@@ -6,4 +6,3 @@ DS_node_labels.txt（n行）：节点标签的列向量，第i行的值对应nod
 DS_edge_labels.txt（m行；与DS_A_sparse.txt大小相同）：DS_A_sparse.txt中的边标签
 DS_node_attributes.txt（n行）：节点属性矩阵，第i行逗号分隔值为node_id为i的节点的属性向量
 DS_edge_attributes.txt（m行；与DS_A.txt大小相同）：DS_A.txt中边的属性
-DS_graph_attributes.txt（N行）：数据集中所有图的回归值，第i行的值是graph_id为i的图的属性
