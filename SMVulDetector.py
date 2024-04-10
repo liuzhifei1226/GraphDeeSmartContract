@@ -231,8 +231,7 @@ for fold_id in range(n_folds):
 
 
     def train(train_loader):
-        optimizer.step()
-        scheduler.step()
+
         model.train()
         start = time.time()
         train_loss, n_samples = 0, 0
@@ -244,7 +243,8 @@ for fold_id in range(n_folds):
             #output = model(data)  # when model is gcn_modify, use this
             loss = loss_fn(output, data[4])
             loss.backward()
-
+            optimizer.step()
+            scheduler.step()
             time_iter = time.time() - start
             train_loss += loss.item() * len(output)
             n_samples += len(output)
