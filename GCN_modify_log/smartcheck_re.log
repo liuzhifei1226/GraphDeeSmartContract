@@ -1,0 +1,31 @@
+using torch 2.2.1+cu121
+dataset REENTRANCY_CORENODES_1671
+model gcn_modify
+lr 0.002
+lr_decay_steps [1, 3]
+wd 0.0001
+dropout 0.2
+filters [64, 64, 64]
+n_hidden 256
+epochs 200
+batch_size 32
+threads 2
+log_interval 1
+device cpu
+seed 50
+shuffle_nodes True
+folds 5
+adj_sq True
+scale_identity False
+use_cont_node_attr True
+alpha 0.2
+multi_head 4
+Loading training_data...
+Class 0: 			1095 samples
+Class 1: 			576 samples
+feature 1, count 5877/5877
+TRAIN: 1336/1671
+TEST: 335/1671
+FOLD 0, train 1336, test 335
+Initialize model...
+N trainable parameters: 41602
