@@ -60,35 +60,25 @@ def split_function(filepath):
     return function_list
 
 
-# generate a potential fallback node
-#def generate_potential_fallback_node(node_feature, edge_feature):
-#    node_feature.append(["F", "F", "NoLimit", ["S"], 0, "MSG"])
-#    edge_feature.append(["S", "F", "S", 0, "FW"])
-#    edge_feature.append(["F", "W0", "F", 1, "FW"])
-#    return node_feature, edge_feature
-
-
-# Position the call.value to generate the graph
+# 定位 call.value 生成图
 def generate_graph(filepath):
-    allFunctionList = split_function(filepath)  # Store all functions
-    callValueList = []  # Store all W functions that call call.value
-    cFunctionList = []  # Store a single C function that calls a W function
-    CFunctionLists = []  # Store all C functions that call W function
-    withdrawNameList = []  # Store the W function name that calls call.value
-    otherFunctionList = []  # Store functions other than W functions
-    node_list = []  # Store all the points
-    edge_list = []  # Store edge and edge nips_features
-    node_feature_list = []  # Store nodes feature
-    params = []  # Store the parameters of the W functions
+    allFunctionList = split_function(filepath)  # 存储所有函数
+    callValueList = []  # 存储所有调用了 call.value 的W函数
+    cFunctionList = []  # 存储一个 调用了W函数的C 函数
+    CFunctionLists = []  # 存储所有调用了W函数的C 函数
+    withdrawNameList = []  # 存储调用了 call.value的W函数的函数名
+    otherFunctionList = []  # 存储W函数以外的函数
+    node_list = []  # 存储所有节点
+    edge_list = []  # 存储所有边及其特征
+    node_feature_list = []  # 存储所有节点特征
+    params = []  # 存储W函数的参数
     param = []
-    key_count = 0  # Number of core nodes S and W
-    c_count = 0  # Number of core nodes C
+    key_count = 0  # S和W节点的数量
+    c_count = 0  # C节点数量
 
-    # ======================================================================
-    # ---------------------------  Handle nodes  ----------------------------
-    # ======================================================================
+    # ---------------------------  处理节点  ----------------------------
 
-    # Store functions other than W functions
+    # 存储除了W的其他函数
     for i in range(len(allFunctionList)):
         flag = 0
         for j in range(len(allFunctionList[i])):
@@ -98,7 +88,7 @@ def generate_graph(filepath):
         if flag == 0:
             otherFunctionList.append(allFunctionList[i])
 
-    # Traverse all functions, find the call.value keyword, store the S and W nodes
+    # 便利所有函数, 找到 call.value 关键字, 存储S和W节点
     for i in range(len(allFunctionList)):
         for j in range(len(allFunctionList[i])):
             text = allFunctionList[i][j]
@@ -196,8 +186,8 @@ def generate_graph(filepath):
                                 ["W" + str(key_count), "W" + str(key_count), "NoLimit", [],
                                  1, "NULL"])
 
-                # For example: function transfer(address _to, uint _value, bytes _data, string _custom_fallback)
-                # get function name (transfer)
+                # function transfer(address _to, uint _value, bytes _data, string _custom_fallback)
+                # 获取函数名： (transfer)
                 tmp = re.compile(r'\b([_A-Za-z]\w*)\b(?:(?=\s*\w+\()|(?!\s*\w+))')
                 result_withdraw = tmp.findall(allFunctionList[i][0])
                 withdrawNameTmp = result_withdraw[1]
@@ -208,7 +198,10 @@ def generate_graph(filepath):
                 withdrawNameList.append(["W" + str(key_count), withdrawName])
 
                 key_count += 1
-
+    # 第一个节点表示状态节点（State Node），使用标识符 "S" 表示，没有限制（NoLimit），不包含任何依赖（["NULL"]），权重为0，没有备注。
+    # 第二个节点表示提款函数（Withdrawal Function），使用标识符 "W0" 表示，没有限制（NoLimit），不包含任何依赖（["NULL"]），权重为0，没有备注。
+    # 第三个节点表示调用函数（Calling Function），使用标识符 "C0" 表示，没有限制（NoLimit），不包含任何依赖（["NULL"]），权重为0，没有备注。
+    # C：调用函数节点
     if key_count == 0:
         print("Currently, there is no key word call.value")
         node_feature_list.append(["S", "S", "NoLimit", ["NULL"], 0, "NULL"])
@@ -757,7 +750,7 @@ def printResult(file, node_feature, edge_feature):
 
 
 if __name__ == "__main__":
-    test_contract = "./source_code/SimpleDAO.sol"
+    test_contract = "./source_code/test2.sol"
     node_feature, edge_feature = generate_graph(test_contract)
     node_feature = sorted(node_feature, key=lambda x: (x[0]))
     edge_feature = sorted(edge_feature, key=lambda x: (x[2], x[3]))
