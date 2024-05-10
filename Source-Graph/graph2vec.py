@@ -5,7 +5,7 @@ from vec2onehot import vec2onehot
 
 """
 S, W, C nips_features: Node nips_features + Edge nips_features + Var nips_features;
-Node self property + Incoming Var + Outgoing Var + Incoming Edge + Outgoing Edge
+节点自身属性 + 入变量 + 出变量 + 入边 + 出边
 """
 
 dict_AC = {"NULL": 0, "LimitedAC": 1, "NoLimit": 2}
@@ -32,7 +32,7 @@ node_convert = {"S": 0, "W0": 1, "C0": 2, "W1": 3, "C1": 4, "W2": 5, "C2": 6, "W
 v2o = vec2onehot()  # create the one-bot dicts
 
 
-# extract the nips_features of each node from input file #
+# 从输入文件中提取每个节点的nips_features #
 def extract_node_features(nodeFile):
     nodeNum = 0
     node_list = []
@@ -58,7 +58,7 @@ def extract_node_features(nodeFile):
     return nodeNum, node_list, node_attribute_list
 
 
-# elimination procedure for sub_graph Start here #
+# 子图形的消除过程 #
 def elimination_node(node_attribute_list):
     main_point = ['S', 'W0', 'W1', 'W2', 'W3', 'W4', 'C0', 'C1', 'C2', 'C3', 'C4']
     extra_var_list = []  # extract var with low priority
@@ -150,7 +150,7 @@ def elimination_edge(edgeFile):
         edge = list(map(str, line.split()))
         edge_list.append(edge)
 
-    # The ablation of multiple edge between two nodes, taking the edge with the edge_operation priority
+    # 消融两个节点之间的多个边缘，取边缘操作优先的边缘
     for k in range(0, len(edge_list)):
         if k + 1 < len(edge_list):
             start1 = edge_list[k][0]  # start node

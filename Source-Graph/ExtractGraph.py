@@ -3,7 +3,7 @@ import re
 import time
 import numpy as np
 
-# map user-defined variables to symbolic names(var)
+# 将用户定义的变量映射到符号名称（var）
 var_list = ['balances[msg.sender]', 'participated[msg.sender]', 'playerPendingWithdrawals[msg.sender]',
             'nonces[msgSender]', 'balances[beneficiary]', 'transactions[transactionId]', 'tokens[token][msg.sender]',
             'totalDeposited[token]', 'tokens[0][msg.sender]', 'accountBalances[msg.sender]', 'accountBalances[_to]',
@@ -16,20 +16,20 @@ var_list = ['balances[msg.sender]', 'participated[msg.sender]', 'playerPendingWi
             'rewardsForA[recipient]', 'userBalance[msg.sender]', 'credit[msg.sender]', 'credit[to]', 'round_[_rd]',
             'userPendingWithdrawals[msg.sender]', '[msg.sender]', '[from]', '[to]', '[_to]', "msg.sender"]
 
-# function limit type
+# 函数限制类型
 function_limit = ['private', 'onlyOwner', 'internal', 'onlyGovernor', 'onlyCommittee', 'onlyAdmin', 'onlyPlayers',
                   'onlyManager', 'onlyHuman', 'only_owner', 'onlyCongressMembers', 'preventReentry', 'onlyMembers',
                   'onlyProxyOwner', 'ownerExists', 'noReentrancy', 'notExecuted', 'noReentrancy', 'noEther',
                   'notConfirmed']
 
-# Boolean condition expression:
+# bool条件表达式:
 var_op_bool = ['!', '~', '**', '*', '!=', '<', '>', '<=', '>=', '==', '<<', '>>', '||', '&&']
 
 # Assignment expressions
 var_op_assign = ['|=', '=', '^=', '&=', '<<=', '>>=', '+=', '-=', '*=', '/=', '%=', '++', '--']
 
 
-# split all functions of contracts
+# 切分合约的所有函数
 def split_function(filepath):
     function_list = []
     f = open(filepath, 'r', encoding='utf-8')
@@ -88,7 +88,7 @@ def generate_graph(filepath):
         if flag == 0:
             otherFunctionList.append(allFunctionList[i])
 
-    # 便利所有函数, 找到 call.value 关键字, 存储S和W节点
+    # 遍历所有函数, 找到 call.value 关键字, 存储S和W节点
     for i in range(len(allFunctionList)):
         for j in range(len(allFunctionList[i])):
             text = allFunctionList[i][j]
@@ -108,8 +108,8 @@ def generate_graph(filepath):
 
                 params.append([param, "S", "W" + str(key_count)])
 
-                # Handling W function access restrictions, which can be used for access restriction properties
-                # default that there are C nodes
+                # 处理W函数权限限制, 用作权限属性
+                # 默认有C节点
                 limit_count = 0
                 for k in range(len(function_limit)):
                     if function_limit[k] in callValueList[key_count][0][0]:
@@ -199,8 +199,8 @@ def generate_graph(filepath):
 
                 key_count += 1
     # 第一个节点表示状态节点（State Node），使用标识符 "S" 表示，没有限制（NoLimit），不包含任何依赖（["NULL"]），权重为0，没有备注。
-    # 第二个节点表示提款函数（Withdrawal Function），使用标识符 "W0" 表示，没有限制（NoLimit），不包含任何依赖（["NULL"]），权重为0，没有备注。
-    # 第三个节点表示调用函数（Calling Function），使用标识符 "C0" 表示，没有限制（NoLimit），不包含任何依赖（["NULL"]），权重为0，没有备注。
+    # 第二个节点表示提款函数（Withdrawal Function），使用标识符 "W" 表示，没有限制（NoLimit），不包含任何依赖（["NULL"]），权重为0，没有备注。
+    # 第三个节点表示调用函数（Calling Function），使用标识符 "C" 表示，没有限制（NoLimit），不包含任何依赖（["NULL"]），权重为0，没有备注。
     # C：调用函数节点
     if key_count == 0:
         print("Currently, there is no key word call.value")
@@ -208,8 +208,8 @@ def generate_graph(filepath):
         node_feature_list.append(["W0", "W0", "NoLimit", ["NULL"], 0, "NULL"])
         node_feature_list.append(["C0", "C0", "NoLimit", ["NULL"], 0, "NULL"])
     else:
-        # Traverse all functions and find the C function nodes that calls the W function
-        # (determine the function call by matching the number of arguments)
+        # 遍历所有函数并找到调用W函数的C函数节点
+        # 通过匹配参数的数量来确定函数调用
         for k in range(len(withdrawNameList)):
             w_key = withdrawNameList[k][0]
             w_name = withdrawNameList[k][1]
@@ -232,7 +232,7 @@ def generate_graph(filepath):
                                     if w_key in node_feature_list[n][0]:
                                         node_feature_list[n][3].append("C" + str(c_count))
 
-                                # Handling C function access restrictions
+                                # 处理 C 函数 权限限制
                                 limit_count = 0
                                 for m in range(len(function_limit)):
                                     if function_limit[m] in cFunctionList[0]:
@@ -247,20 +247,18 @@ def generate_graph(filepath):
                                 break
 
         if c_count == 0:
-            print("There is no C node")
+            print("没有C类节点")
             node_list.append("C0")
             node_feature_list.append(["C0", "C0", "NoLimit", ["NULL"], 0, "NULL"])
             for n in range(len(node_feature_list)):
                 if "W" in node_feature_list[n][0]:
                     node_feature_list[n][3] = ["NULL"]
 
-        # ======================================================================
-        # ---------------------------  Handle edge  ----------------------------
-        # ======================================================================
+        # ---------------------------  处理边  ----------------------------
 
-        # (1) W->S (include: W->VAR, VAR->S, S->VAR)
+        # (1)处理 W->S (包括: W->VAR, VAR->S, S->VAR)
         for i in range(len(callValueList)):
-            flag = 0  # flag: flag = 0, before call.value; flag > 0, after call.value
+            flag = 0  # flag: flag = 0, call.value之前; flag > 0, call.value之后
             before_var_count = 0
             after_var_count = 0
             var_tmp = []
@@ -270,8 +268,8 @@ def generate_graph(filepath):
                 text = callValueList[i][0][j]
                 if '.call.value' not in text:
                     if flag == 0:
-                        # print("before call.value")
-                        # handle W -> VAR
+                        # print(" call.value 前")
+                        # 处理 W -> VAR
                         for k in range(len(var_list)):
                             if var_list[k] in text:
                                 node_list.append("VAR" + str(before_var_count))
@@ -422,8 +420,8 @@ def generate_graph(filepath):
                                                  callValueList[i][2], 1, 'NULL'])
 
                     elif flag != 0:
-                        # print("after call.value")
-                        # handle S->VAR
+                        # print("call.value 后")
+                        # 处理 S->VAR
                         var_count = 0
                         for k in range(len(var_list)):
                             if var_list[k] in text:
@@ -616,7 +614,7 @@ def generate_graph(filepath):
                             edge_list.append(
                                 [callValueList[i][2], callValueList[i][1], callValueList[i][2], 1, 'FW'])
 
-        # (2) handle C->W (include C->VAR, VAR->W)
+        # (2) 处理 C->W (包括 C->VAR, VAR->W)
         for i in range(len(CFunctionLists)):
             for j in range(len(CFunctionLists[i][3])):
                 text = CFunctionLists[i][3][j]
@@ -705,7 +703,7 @@ def generate_graph(filepath):
                 else:
                     print("The C function does not call the corresponding W function")
 
-    # Handling some duplicate elements, the filter leaves a unique
+    # 去掉重复节点
     edge_list = list(set([tuple(t) for t in edge_list]))
     edge_list = [list(v) for v in edge_list]
     node_feature_list_new = []
