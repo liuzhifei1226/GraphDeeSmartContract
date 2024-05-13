@@ -86,6 +86,9 @@ def build_graph(ast):
 
 # 主函数
 def main():
+
+    install_solc("latest")  # 安装最新版本的Solidity编译器
+
     source_code = """
     // Solidity源代码示例
     contract MyContract {
