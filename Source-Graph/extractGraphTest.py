@@ -30,6 +30,9 @@ def build_graph(ast):
     nodes = []
     edges = []
 
+    # 检查AST结构
+    print(ast)
+
     # 遍历AST并构建节点和边
     for source_unit in ast["contracts"]["contract.sol"]:
         for node_type, node_data in source_unit.items():
