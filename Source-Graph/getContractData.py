@@ -36,6 +36,8 @@ compiled_sol = compile_standard(
 
 contract_name = list(compiled_sol["contracts"]["MyContract.sol"].keys())[0]
 contract_json = compiled_sol["contracts"]["MyContract.sol"][contract_name]
+print(contract_json)
+
 ast = json.loads(contract_json["evm"]["deployedBytecode"]["sourceMap"])
 
 # 遍历AST并存储每个函数的变量
