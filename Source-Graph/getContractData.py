@@ -1,11 +1,11 @@
-from solcx import compile_standard, install_solc,get_installable_solc_versions
+from solcx import compile_standard, install_solc
 import json
+import solcx
 
 
-versions = get_installable_solc_versions()
-print(versions)  # 打印可用的solc版本列表
-install_solc("0.8.9")  # 安装指定版本的solc编译器
 
+
+solcx.install_solc("0.8.9")
 
 # Solidity智能合约源代码
 contract_source_code = """
