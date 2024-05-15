@@ -63,7 +63,6 @@ def split_function(filepath):
 # 定位 call.value 生成图
 def generate_graph(filepath):
     allFunctionList = split_function(filepath)  # 存储所有函数
-    print("===allFunctionList===:\n",allFunctionList)
     callValueList = []  # 存储所有调用了 call.value 的W函数
     cFunctionList = []  # 存储一个 调用了W函数的C 函数
     CFunctionLists = []  # 存储所有调用了W函数的C 函数
@@ -77,8 +76,6 @@ def generate_graph(filepath):
     key_count = 0  # S和W节点的数量
     c_count = 0  # C节点数量
 
-    edgeDataDepend = [] # 存储涉及数据依赖的边上面的数据
-
     # ---------------------------  处理节点  ----------------------------
 
     # 存储除了W的其他函数
@@ -90,7 +87,6 @@ def generate_graph(filepath):
                 flag += 1
         if flag == 0:
             otherFunctionList.append(allFunctionList[i])
-    print("===otherFunctionList====:\n", otherFunctionList)
 
     # 遍历所有函数, 找到 call.value 关键字, 存储S和W节点
     for i in range(len(allFunctionList)):
@@ -101,18 +97,17 @@ def generate_graph(filepath):
                 node_list.append("W" + str(key_count))
                 callValueList.append([allFunctionList[i], "S", "W" + str(key_count)])
 
-                # 获取函数名和参数
+                # get the function name and params
                 ss = allFunctionList[i][0]
                 pp = re.compile(r'[(](.*?)[)]', re.S)
                 result = re.findall(pp, ss)
                 result_params = result[0].split(",")
-                print("===result_params====:\n", result_params)
 
                 for n in range(len(result_params)):
                     param.append(result_params[n].strip().split(" ")[-1])
 
                 params.append([param, "S", "W" + str(key_count)])
-                print("===params====:\n", params)
+
                 # 处理W函数权限限制, 用作权限属性
                 # 默认有C节点
                 limit_count = 0
@@ -121,21 +116,19 @@ def generate_graph(filepath):
                         limit_count += 1
                         if "address" in text:
                             node_feature_list.append(
-                                ["S", "LimitedAC", ["W" + str(key_count)],
-                                 2, "INNADD", 0])
+                                ["S", "S", "LimitedAC", ["W" + str(key_count)],
+                                 2, "INNADD"])
                             node_feature_list.append(
-                                ["W" + str(key_count), "LimitedAC", [],
-                                 1, "NULL", 1])
-                            edgeDataDepend.append(["S", "W" + str(key_count), "address"])
+                                ["W" + str(key_count), "W" + str(key_count), "LimitedAC", [],
+                                 1, "NULL"])
                             break
                         elif "msg.sender" in text:
                             node_feature_list.append(
-                                ["S", "LimitedAC", ["W" + str(key_count)],
-                                 2, "MSG",0])
+                                ["S", "S", "LimitedAC", ["W" + str(key_count)],
+                                 2, "MSG"])
                             node_feature_list.append(
                                 ["W" + str(key_count), "W" + str(key_count), "LimitedAC", [],
-                                 1, "NULL", 1])
-                            edgeDataDepend.append(["S", "W" + str(key_count), "msg.sender"])
+                                 1, "NULL"])
                             break
                         else:
                             param_count = 0
@@ -201,24 +194,20 @@ def generate_graph(filepath):
                 if withdrawNameTmp == "payable":
                     withdrawName = withdrawNameTmp
                 else:
-                    '''
-                    函数名后加左括号？
-                    '''
                     withdrawName = withdrawNameTmp + "("
                 withdrawNameList.append(["W" + str(key_count), withdrawName])
-                print("===withdrawNameList====:\n", withdrawNameList)
+
                 key_count += 1
     # 第一个节点表示状态节点（State Node），使用标识符 "S" 表示，没有限制（NoLimit），不包含任何依赖（["NULL"]），权重为0，没有备注。
     # 第二个节点表示提款函数（Withdrawal Function），使用标识符 "W" 表示，没有限制（NoLimit），不包含任何依赖（["NULL"]），权重为0，没有备注。
     # 第三个节点表示调用函数（Calling Function），使用标识符 "C" 表示，没有限制（NoLimit），不包含任何依赖（["NULL"]），权重为0，没有备注。
     # C：调用函数节点
     if key_count == 0:
-        print("不存在关键字: call.value,添加默认节点")
+        print("Currently, there is no key word call.value")
         node_feature_list.append(["S", "S", "NoLimit", ["NULL"], 0, "NULL"])
         node_feature_list.append(["W0", "W0", "NoLimit", ["NULL"], 0, "NULL"])
         node_feature_list.append(["C0", "C0", "NoLimit", ["NULL"], 0, "NULL"])
     else:
-        print("遍历所有函数并找到调用W函数的C函数节点")
         # 遍历所有函数并找到调用W函数的C函数节点
         # 通过匹配参数的数量来确定函数调用
         for k in range(len(withdrawNameList)):
@@ -258,13 +247,13 @@ def generate_graph(filepath):
                                 break
 
         if c_count == 0:
-            print("没有C节点，添加默认节点")
+            print("没有C类节点")
             node_list.append("C0")
             node_feature_list.append(["C0", "C0", "NoLimit", ["NULL"], 0, "NULL"])
             for n in range(len(node_feature_list)):
                 if "W" in node_feature_list[n][0]:
                     node_feature_list[n][3] = ["NULL"]
-        print("===node_feature_list====:\n", node_feature_list)
+
         # ---------------------------  处理边  ----------------------------
 
         # (1)处理 W->S (包括: W->VAR, VAR->S, S->VAR)
@@ -275,14 +264,12 @@ def generate_graph(filepath):
             var_tmp = []
             var_name = []
             var_w_name = []
-            print("处理边w->s: ===callValueList[i][0]====:\n", callValueList[i][0])
             for j in range(len(callValueList[i][0])):
                 text = callValueList[i][0][j]
                 if '.call.value' not in text:
                     if flag == 0:
-                        print("call.value 前\n")
+                        # print(" call.value 前")
                         # 处理 W -> VAR
-                        print("===处理 W -> VAR====\n")
                         for k in range(len(var_list)):
                             if var_list[k] in text:
                                 node_list.append("VAR" + str(before_var_count))
@@ -372,8 +359,6 @@ def generate_graph(filepath):
                                     var_w_name.append(var_list[k])
                                     var_name.append(var_list[k])
                                     before_var_count += 1
-                                    print("处理边w->s: ===var_w_name====:\n", var_w_name)
-                                    print("处理边w->s: ===var_name====:\n", var_name)
                                 else:
                                     var_w_count = 0
                                     for n in range(len(var_w_name)):
@@ -435,9 +420,8 @@ def generate_graph(filepath):
                                                  callValueList[i][2], 1, 'NULL'])
 
                     elif flag != 0:
-                        print("call.value 后")
+                        # print("call.value 后")
                         # 处理 S->VAR
-                        print("===处理 S -> VAR====\n")
                         var_count = 0
                         for k in range(len(var_list)):
                             if var_list[k] in text:
@@ -542,8 +526,7 @@ def generate_graph(filepath):
                                                      'FW'])
 
                                             after_var_count += 1
-                    print("======edge_list====",edge_list)
-                    print("======edge_feature====",edge_feature)
+
                 elif '.call.value' in text:
                     flag += 1
 
@@ -630,11 +613,8 @@ def generate_graph(filepath):
                         else:
                             edge_list.append(
                                 [callValueList[i][2], callValueList[i][1], callValueList[i][2], 1, 'FW'])
-                    print("======edge_list2====", edge_list)
-                    print("======edge_feature2====", edge_feature)
+
         # (2) 处理 C->W (包括 C->VAR, VAR->W)
-        print("处理C->W:\n")
-        print("C->W:=====CFunctionLists=======\n", CFunctionLists)
         for i in range(len(CFunctionLists)):
             for j in range(len(CFunctionLists[i][3])):
                 text = CFunctionLists[i][3][j]
@@ -721,7 +701,7 @@ def generate_graph(filepath):
                             [CFunctionLists[i][2], CFunctionLists[i][0], CFunctionLists[i][2], 1, 'FW'])
                     break
                 else:
-                    print("C函数不调用相应的W函数")
+                    print("The C function does not call the corresponding W function")
 
     # 去掉重复节点
     edge_list = list(set([tuple(t) for t in edge_list]))
@@ -737,7 +717,7 @@ def generate_graph(filepath):
 
 def printResult(file, node_feature, edge_feature):
     main_point = ['S', 'W0', 'W1', 'W2', 'W3', 'W4', 'C0', 'C1', 'C2', 'C3', 'C4']
-    print("print result: =====node_feature=======\n", node_feature)
+
     for i in range(len(node_feature)):
         if node_feature[i][0] in main_point:
             for j in range(0, len(node_feature[i][3]), 2):
@@ -768,7 +748,7 @@ def printResult(file, node_feature, edge_feature):
 
 
 if __name__ == "__main__":
-    test_contract = "./source_code/SimpleDAO.sol"
+    test_contract = "./source_code/test2.sol"
     node_feature, edge_feature = generate_graph(test_contract)
     node_feature = sorted(node_feature, key=lambda x: (x[0]))
     edge_feature = sorted(edge_feature, key=lambda x: (x[2], x[3]))

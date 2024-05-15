@@ -1,0 +1,54 @@
+from solcx import compile_standard, install_solc
+import json
+
+# 安装solc版本
+install_solc("0.8.9")
+
+# Solidity智能合约源代码
+contract_source_code = """
+pragma solidity ^0.8.0;
+
+contract MyContract {
+    uint256 public number;
+
+    constructor(uint256 _number) {
+        number = _number;
+    }
+
+    function addNumber(uint256 _value) public {
+        number += _value;
+    }
+
+    function subtractNumber(uint256 _value) public {
+        number -= _value;
+    }
+}
+"""
+
+# 编译Solidity合约并获取AST
+compiled_sol = compile_standard(
+    {
+        "language": "Solidity",
+        "sources": {"MyContract.sol": {"content": contract_source_code}},
+        "settings": {"outputSelection": {"*": {"*": ["*"]}}},
+    }
+)
+
+contract_name = list(compiled_sol["contracts"]["MyContract.sol"].keys())[0]
+contract_json = compiled_sol["contracts"]["MyContract.sol"][contract_name]
+ast = json.loads(contract_json["evm"]["deployedBytecode"]["sourceMap"])
+
+# 遍历AST并存储每个函数的变量
+functions_variables = {}
+
+for node in ast["children"]:
+    if "name" in node and node["name"] == contract_name:
+        for func in node["children"]:
+            if "name" in func:
+                function_name = func["name"]
+                variables = []
+                for var in func["variables"]:
+                    variables.append(var["name"])
+                functions_variables[function_name] = variables
+
+print(functions_variables)
