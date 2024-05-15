@@ -1,8 +1,8 @@
 from solcx import compile_standard, install_solc
 import json
 
-# 安装solc版本
-install_solc("0.8.9")
+install_solc()
+
 
 # Solidity智能合约源代码
 contract_source_code = """
