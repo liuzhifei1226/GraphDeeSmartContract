@@ -58,7 +58,7 @@ def main():
     # Number of repetitions of 10-CV.
     num_reps = 3
 
-    ### Larger datasets using LIBLINEAR with edge labels.
+    ### Larger datasets using LIBLINEAR with callee_edge labels.
     dataset = [["MOLT-4", True, True], ["Yeast", True, True], ["MCF-7", True, True],
                ["github_stargazers", False, False],
                ["reddit_threads", False, False]]

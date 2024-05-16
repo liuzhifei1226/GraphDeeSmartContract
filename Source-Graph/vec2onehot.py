@@ -26,11 +26,11 @@ class vec2onehot:
     # map user-defined variables (internal state) to symbolic names (e.g.,“VAR1”, “VAR2”) in the one-to-one fashion.
     nodelist = ['NULL', 'VAR0', 'VAR1', 'VAR2', 'VAR3', 'VAR4', 'VAR4', 'S', 'W0', 'W1', 'W2',
                 'W3', 'W4', 'C0', 'C1', 'C2', 'C3', 'C4']
-    # Edges (Variable-related, Program-related, Extension edge)
+    # Edges (Variable-related, Program-related, Extension callee_edge)
     edgeOPlist = ["FW", "IF", "GB", "GN", "WHILE", "FOR", "RE", "AH", "RG", "RH", "IT"]
     # variable expression
     varOPlist = ["NULL", "BOOL", "ASSIGN"]
-    # node call representation
+    # callee_node call representation
     nodeOplist = ["NULL", "MSG", "INNADD"]
     # map user-defined arguments to symbolic names (e.g., “ARG1”,“ARG2”) in the one-to-one fashion;
     # Condition variable; Constants

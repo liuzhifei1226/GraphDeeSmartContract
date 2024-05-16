@@ -73,7 +73,7 @@ def elimination_node(node_attribute_list):
                     if loc2 - loc1 == 1:
                         op1_index = dict_VarOpName[op1]
                         op2_index = dict_VarOpName[op2]
-                        # extract node attribute based on priority
+                        # extract callee_node attribute based on priority
                         if op1_index < op2_index:
                             extra_var_list.append(node_attribute_list.pop(i))
                         else:
@@ -82,7 +82,7 @@ def elimination_node(node_attribute_list):
 
 
 def embedding_node(node_attribute_list):
-    # embedding each node after elimination #
+    # embedding each callee_node after elimination #
     node_encode = []
     var_encode = []
     node_embedding = []
@@ -138,9 +138,9 @@ def embedding_node(node_attribute_list):
 
 
 def elimination_edge(edgeFile):
-    # eliminate edge #
-    edge_list = []  # all edge
-    extra_edge_list = []  # eliminated edge
+    # eliminate callee_edge #
+    edge_list = []  # all callee_edge
+    extra_edge_list = []  # eliminated callee_edge
 
     f = open(edgeFile)
     lines = f.readlines()
@@ -153,8 +153,8 @@ def elimination_edge(edgeFile):
     # 消融两个节点之间的多个边缘，取边缘操作优先的边缘
     for k in range(0, len(edge_list)):
         if k + 1 < len(edge_list):
-            start1 = edge_list[k][0]  # start node
-            end1 = edge_list[k][1]  # end node
+            start1 = edge_list[k][0]  # start callee_node
+            end1 = edge_list[k][1]  # end callee_node
             op1 = edge_list[k][4]
             start2 = edge_list[k + 1][0]
             end2 = edge_list[k + 1][1]
@@ -162,7 +162,7 @@ def elimination_edge(edgeFile):
             if start1 == start2 and end1 == end2:
                 op1_index = dict_EdgeOpName[op1]
                 op2_index = dict_EdgeOpName[op2]
-                # extract edge attribute based on priority
+                # extract callee_edge attribute based on priority
                 if op1_index < op2_index:
                     extra_edge_list.append(edge_list.pop(k))
                 else:
@@ -172,13 +172,13 @@ def elimination_edge(edgeFile):
 
 
 def embedding_edge(edge_list):
-    # extract & embedding the nips_features of each edge from input file #
+    # extract & embedding the nips_features of each callee_edge from input file #
     edge_encode = []
     edge_embedding = []
 
     for k in range(len(edge_list)):
-        start = edge_list[k][0]  # start node
-        end = edge_list[k][1]  # end node
+        start = edge_list[k][0]  # start callee_node
+        end = edge_list[k][1]  # end callee_node
         a, b, c = edge_list[k][2], edge_list[k][3], edge_list[k][4]  # origin info
 
         ef1 = dict_NodeName[a]
@@ -200,7 +200,7 @@ def embedding_edge(edge_list):
 
 def construct_vec(edge_list, node_embedding, var_embedding, edge_embedding, edge_encode):
     # Vec: Node self property + Incoming Var + Outgoing Var + Incoming Edge + Outgoing Edge
-    print("Start constructing node vector...")
+    print("Start constructing callee_node vector...")
     var_in_node = []
     var_in = []
     var_out_node = []
@@ -271,7 +271,7 @@ def construct_vec(edge_list, node_embedding, var_embedding, edge_embedding, edge
                         edge_in.append([edge_embedding[k][1], edge_embedding[k][2]])
                         break
             else:
-                print("Edge from node %s to node %s:  edgeFeature: %s" % (
+                print("Edge from callee_node %s to callee_node %s:  edgeFeature: %s" % (
                     edge_embedding[k][0], edge_embedding[k][1], edge_embedding[k][2]))
     else:
         for k in range(len(edge_embedding)):
@@ -399,8 +399,8 @@ def construct_vec(edge_list, node_embedding, var_embedding, edge_embedding, edge
 
 
 if __name__ == "__main__":
-    node = "./graph_data/node/SimpleDAO.sol"
-    edge = "./graph_data/edge/SimpleDAO.sol"
+    node = "./graph_data/callee_node/SimpleDAO.sol"
+    edge = "./graph_data/callee_callee_edge/SimpleDAO.sol"
     nodeNum, node_list, node_attribute_list = extract_node_features(node)
     node_attribute_list, extra_var_list = elimination_node(node_attribute_list)
     node_encode, var_encode, node_embedding, var_embedding = embedding_node(node_attribute_list)

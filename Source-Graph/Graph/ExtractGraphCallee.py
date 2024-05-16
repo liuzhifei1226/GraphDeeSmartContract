@@ -126,16 +126,18 @@ def generate_graph(filepath):
                             node_feature_list.append(
                                 ["W" + str(key_count), "LimitedAC", [],
                                  1, "NULL", 1])
-                            edgeDataDepend.append(["S", "W" + str(key_count), "address"])
+                            # 添加边的数据依赖  数据
+                            # edgeDataDepend.append(["S", "W" + str(key_count), "address"])
                             break
                         elif "msg.sender" in text:
                             node_feature_list.append(
                                 ["S", "LimitedAC", ["W" + str(key_count)],
-                                 2, "MSG",0])
+                                 2, "MSG", 0])
                             node_feature_list.append(
-                                ["W" + str(key_count), "W" + str(key_count), "LimitedAC", [],
+                                ["W" + str(key_count), "LimitedAC", [],
                                  1, "NULL", 1])
-                            edgeDataDepend.append(["S", "W" + str(key_count), "msg.sender"])
+                            # 添加边的数据依赖  数据
+                            # edgeDataDepend.append(["S", "W" + str(key_count), "msg.sender"])
                             break
                         else:
                             param_count = 0
@@ -143,55 +145,66 @@ def generate_graph(filepath):
                                 if pa in text and pa != "":
                                     param_count += 1
                                     node_feature_list.append(
-                                        ["S", "S", "LimitedAC",
+                                        ["S", "LimitedAC",
                                          ["W" + str(key_count)],
-                                         2, "MSG"])
+                                         2, "MSG",0])
                                     node_feature_list.append(
-                                        ["W" + str(key_count), "W" + str(key_count), "LimitedAC", [],
-                                         1, "NULL"])
+                                        ["W" + str(key_count), "LimitedAC", [],
+                                         1, "NULL", 1])
+                                    # 添加边的数据依赖  数据
+                                    # edgeDataDepend.append(["S", "W" + str(key_count), "msg.sender"])
                                     break
                             if param_count == 0:
                                 node_feature_list.append(
-                                    ["S", "S", "LimitedAC", ["W" + str(key_count)],
-                                     2, "INNADD"])
+                                    ["S", "LimitedAC", ["W" + str(key_count)],
+                                     2, "INNADD", 0])
                                 node_feature_list.append(
-                                    ["W" + str(key_count), "W" + str(key_count), "LimitedAC", [],
-                                     1, "NULL"])
+                                    ["W" + str(key_count), "LimitedAC", [],
+                                     1, "NULL", 0])
                             break
+
                 if limit_count == 0:
                     if "address" in text:
                         node_feature_list.append(
-                            ["S", "S", "NoLimit", ["W" + str(key_count)],
-                             2, "INNADD"])
+                            ["S", "NoLimit", ["W" + str(key_count)],
+                             2, "INNADD", 0])
                         node_feature_list.append(
-                            ["W" + str(key_count), "W" + str(key_count), "NoLimit", [],
-                             1, "NULL"])
+                            ["W" + str(key_count), "NoLimit", [],
+                             1, "NULL", 1])
+                        # 添加边的数据依赖  数据
+                        # edgeDataDepend.append(["S", "W" + str(key_count), "address"])
                     elif "msg.sender" in text:
                         node_feature_list.append(
-                            ["S", "S", "NoLimit", ["W" + str(key_count)],
-                             2, "MSG"])
+                            ["S", "NoLimit", ["W" + str(key_count)],
+                             2, "MSG", 0])
                         node_feature_list.append(
-                            ["W" + str(key_count), "W" + str(key_count), "NoLimit", [],
-                             1, "NULL"])
+                            ["W" + str(key_count), "NoLimit", [],
+                             1, "NULL", 1])
+                        # 添加边的数据依赖  数据
+                        # edgeDataDepend.append(["S", "W" + str(key_count), "msg.sender"])
                     else:
                         param_count = 0
                         for pa in param:
                             if pa in text and pa != "":
                                 param_count += 1
                                 node_feature_list.append(
-                                    ["S", "S", "NoLimit", ["W" + str(key_count)],
-                                     2, "MSG"])
+                                    ["S", "NoLimit", ["W" + str(key_count)],
+                                     2, "MSG", 0])
                                 node_feature_list.append(
-                                    ["W" + str(key_count), "W" + str(key_count), "NoLimit", [],
-                                     1, "NULL"])
+                                    ["W" + str(key_count), "NoLimit", [],
+                                     1, "NULL", 1])
+                                # 添加边的数据依赖  数据
+                                # edgeDataDepend.append(["S", "W" + str(key_count), "msg.sender"])
                                 break
                         if param_count == 0:
                             node_feature_list.append(
-                                ["S", "S", "NoLimit", ["W" + str(key_count)],
+                                ["S", "NoLimit", ["W" + str(key_count)],
                                  2, "INNADD"])
                             node_feature_list.append(
-                                ["W" + str(key_count), "W" + str(key_count), "NoLimit", [],
-                                 1, "NULL"])
+                                ["W" + str(key_count), "NoLimit", [],
+                                 1, "NULL", ])
+                            # 添加边的数据依赖  数据
+                            # edgeDataDepend.append(["S", "W" + str(key_count), "address"])
 
                 # function transfer(address _to, uint _value, bytes _data, string _custom_fallback)
                 # 获取函数名： (transfer)
@@ -214,9 +227,9 @@ def generate_graph(filepath):
     # C：调用函数节点
     if key_count == 0:
         print("不存在关键字: call.value,添加默认节点")
-        node_feature_list.append(["S", "S", "NoLimit", ["NULL"], 0, "NULL"])
-        node_feature_list.append(["W0", "W0", "NoLimit", ["NULL"], 0, "NULL"])
-        node_feature_list.append(["C0", "C0", "NoLimit", ["NULL"], 0, "NULL"])
+        node_feature_list.append(["S", "NoLimit", ["NULL"], 0, "NULL", 0])
+        node_feature_list.append(["W0", "NoLimit", ["NULL"], 0, "NULL", 0])
+        node_feature_list.append(["C0", "NoLimit", ["NULL"], 0, "NULL", 0])
     else:
         print("遍历所有函数并找到调用W函数的C函数节点")
         # 遍历所有函数并找到调用W函数的C函数节点
@@ -249,18 +262,18 @@ def generate_graph(filepath):
                                     if function_limit[m] in cFunctionList[0]:
                                         limit_count += 1
                                         node_feature_list.append(
-                                            ["C" + str(c_count), "C" + str(c_count), "LimitedAC", ["NULL"], 0, "NULL"])
+                                            ["C" + str(c_count), "LimitedAC", ["NULL"], 0, "NULL", -1])
                                         break
                                 if limit_count == 0:
                                     node_feature_list.append(
-                                        ["C" + str(c_count), "C" + str(c_count), "NoLimit", ["NULL"], 0, "NULL"])
+                                        ["C" + str(c_count), "NoLimit", ["NULL"], 0, "NULL", -1])
                                 c_count += 1
                                 break
 
         if c_count == 0:
             print("没有C节点，添加默认节点")
             node_list.append("C0")
-            node_feature_list.append(["C0", "C0", "NoLimit", ["NULL"], 0, "NULL"])
+            node_feature_list.append(["C0", "NoLimit", ["NULL"], 0, "NULL", 0])
             for n in range(len(node_feature_list)):
                 if "W" in node_feature_list[n][0]:
                     node_feature_list[n][3] = ["NULL"]
@@ -748,8 +761,8 @@ def printResult(file, node_feature, edge_feature):
 
             node_feature[i][3] = tmp
 
-    nodeOutPath = "./graph_data/node/" + file
-    edgeOutPath = "./graph_data/edge/" + file
+    nodeOutPath = "../graph_data/callee_node/" + file
+    edgeOutPath = "../graph_data/callee_callee_edge/" + file
 
     f_node = open(nodeOutPath, 'a')
     for i in range(len(node_feature)):
@@ -768,7 +781,7 @@ def printResult(file, node_feature, edge_feature):
 
 
 if __name__ == "__main__":
-    test_contract = "./source_code/SimpleDAO.sol"
+    test_contract = "../source_code/SimpleDAO.sol"
     node_feature, edge_feature = generate_graph(test_contract)
     node_feature = sorted(node_feature, key=lambda x: (x[0]))
     edge_feature = sorted(edge_feature, key=lambda x: (x[2], x[3]))

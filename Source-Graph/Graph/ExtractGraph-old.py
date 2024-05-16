@@ -728,8 +728,8 @@ def printResult(file, node_feature, edge_feature):
 
             node_feature[i][3] = tmp
 
-    nodeOutPath = "./graph_data/node/" + file
-    edgeOutPath = "./graph_data/edge/" + file
+    nodeOutPath = "./graph_data/callee_node/" + file
+    edgeOutPath = "./graph_data/callee_callee_edge/" + file
 
     f_node = open(nodeOutPath, 'a')
     for i in range(len(node_feature)):

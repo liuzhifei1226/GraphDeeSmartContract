@@ -10,7 +10,7 @@ use_labels, use_edge_labels = True, False
 all_matrices = []
 # Compute 1-WL kernel for 1 to 5 iterations.
 for i in range(1, 6):
-    # Use node labels and no edge labels.
+    # Use callee_node labels and no callee_edge labels.
     gm = kb.compute_wl_1_dense("ENZYMES", i, use_labels, use_edge_labels)
     # Apply cosine normalization.
     gm = aux.normalize_gram_matrix(gm)

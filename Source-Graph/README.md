@@ -5,7 +5,7 @@
 * Find the relationships between functions.
 * Extract all smart contracts source code into the corresponding contract graph consisting of nodes and edges.
 ```shell
-python3 ExtractGraph.py
+python3 ExtractGraphCallee.py
 ```
 
 `graph2vec.py`

@@ -10,7 +10,7 @@ use_labels, use_edge_labels = True, True
 all_matrices = []
 # Compute 1-WL kernel for 1 to 5 iterations.
 for i in range(1, 6):
-    # Use node labels and edge labels.
+    # Use callee_node labels and callee_edge labels.
     gm = kb.compute_wl_1_sparse(dataset, i, use_labels, use_edge_labels)
     # Apply \ell_2 normalization.
     gm_n = aux.normalize_feature_vector(gm)

@@ -56,7 +56,7 @@ def gnn_evaluation(gnn, ds_name, layers, hidden, max_num_epochs=200, batch_size=
     path = osp.join(osp.dirname(osp.realpath(__file__)), '..', 'datasets', ds_name)
     dataset = TUDataset(path, name=ds_name).shuffle()
 
-    # One-hot degree if node labels are not available.
+    # One-hot degree if callee_node labels are not available.
     # The following if clause is taken from  https://github.com/rusty1s/pytorch_geometric/blob/master/benchmark/kernel/datasets.py.
     if dataset.data.x is None:
         max_degree = 0
