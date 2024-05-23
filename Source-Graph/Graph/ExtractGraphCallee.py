@@ -147,7 +147,7 @@ def generate_graph(filepath):
                                     node_feature_list.append(
                                         ["S", "LimitedAC",
                                          ["W" + str(key_count)],
-                                         2, "MSG",0])
+                                         2, "MSG", 0])
                                     node_feature_list.append(
                                         ["W" + str(key_count), "LimitedAC", [],
                                          1, "NULL", 1])
@@ -555,8 +555,8 @@ def generate_graph(filepath):
                                                      'FW'])
 
                                             after_var_count += 1
-                    print("======edge_list====",edge_list)
-                    print("======edge_feature====",edge_feature)
+                    # print("======edge_list====",edge_list)
+                    # print("======edge_feature====", edge_feature)
                 elif '.call.value' in text:
                     flag += 1
 
@@ -643,8 +643,8 @@ def generate_graph(filepath):
                         else:
                             edge_list.append(
                                 [callValueList[i][2], callValueList[i][1], callValueList[i][2], 1, 'FW'])
-                    print("======edge_list2====", edge_list)
-                    print("======edge_feature2====", edge_feature)
+                    # print("======edge_list2====", edge_list)
+                    # print("======edge_feature2====", edge_feature)
         # (2) 处理 C->W (包括 C->VAR, VAR->W)
         print("处理C->W:\n")
         print("C->W:=====CFunctionLists=======\n", CFunctionLists)
@@ -772,6 +772,7 @@ def printResult(file, node_feature, edge_feature):
 
     f_edge = open(edgeOutPath, 'a')
     for i in range(len(edge_feature)):
+        print("iiiiiiii", i)
         result = " ".join(np.array(edge_feature[i]))
         print(result)
         f_edge.write(result + '\n')

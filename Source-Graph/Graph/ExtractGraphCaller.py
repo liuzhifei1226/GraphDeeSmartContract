@@ -16,18 +16,21 @@ def generate_graph_caller(contract_caller, contract_callee):
     print("contract_name_matches:", contract_name_matches)
 
     if contract_name_matches:
+
         for i in contract_name_matches:
-
+            print("i:", i)
             # 使用正则表达式搜索合约A中调用合约B的语句
-            call_pattern = re.compile(r'\b{}\b\s*\.\s*\w+\s*\(.*\)\s*;'.format(re.escape(i)), re.IGNORECASE)
-
-            call_matches = call_pattern.findall(contract_caller_code)
-
-            if call_matches:
+            # call_pattern = re.compile(r'\b{}\b\s*\.\s*\w+\s*\(.*\)\s*;'.format(re.escape(i)), re.IGNORECASE)
+            #
+            # call_matches = call_pattern.findall(contract_caller_code)
+            # print("contract_caller_code:", contract_caller_code)
+            if i in contract_caller_code:
                 print("在合约A中找到调用合约B的语句：")
                 # for match in call_matches:
-                print(call_matches)
-                caller_node.append(["C"+i, "NoLimit", ["NULL"], 0, ["CALLER"], 0])
+                # print("call_matches:", call_matches)
+                caller_node.append(["C1", "NoLimit", ["W1"], 0, ["CALLER"], 0])
+                caller_node.append(["S", "NoLimit", ["W1"], 1, ["CALLER"], 0])
+                caller_node.append(["W1", "NoLimit", ["NULL"], 2, ["CALLER"], 0])
                 return caller_node
             else:
                 print("在合约A中未找到调用合约B的语句。")
@@ -40,9 +43,10 @@ def printResult(file, caller_node):
     f_node = open(nodeOutPath, 'a')
     if caller_node:
         for item in caller_node:
-            print(item)
+            print("item:",item)
             for i in item:
-                result = " ".join(np.array(i))
+
+                result = " ".join(np.array[i])
                 f_node.write(result + '\n')
     else:
         print("在caller合约中未找到调用语句")
