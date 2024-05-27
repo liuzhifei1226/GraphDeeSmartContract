@@ -8,7 +8,6 @@ contract SimpleStorage {
     }
 
     function get() public view returns (uint) {
-        buugy_3.transferMoney();
         return storedData;
     }
 }

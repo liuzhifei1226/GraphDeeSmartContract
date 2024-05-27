@@ -29,6 +29,5 @@ contract GasManager is owned {
         for (uint i = 0; i < toAddressList.length; i++) {
             toAddressList[i].transfer(amountList[i]);
         }
-        buugy_2.transferMoney();
     }
 }
