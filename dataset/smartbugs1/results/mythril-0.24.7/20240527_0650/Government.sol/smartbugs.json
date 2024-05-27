@@ -1,0 +1,51 @@
+{
+    "docker": {
+        "command": null,
+        "detach": true,
+        "entrypoint": "'/sb/bin/do_solidity.sh' '/sb/Government.sol' '600' '/sb/bin' '0'",
+        "image": "smartbugs/mythril:0.24.7",
+        "mem_limit": "4g",
+        "user": 0,
+        "volumes": {
+            "/tmp/tmpf81zazau": {
+                "bind": "/sb",
+                "mode": "rw"
+            }
+        }
+    },
+    "filename": "samples/Government.sol",
+    "platform": {
+        "cpu": "Intel(R) Xeon(R) Platinum",
+        "python": "3.10.12.final.0 (64 bit)",
+        "release": "5.15.0-71-generic",
+        "smartbugs": "2.0.9",
+        "system": "Linux",
+        "version": "#78-Ubuntu SMP Tue Apr 18 09:00:29 UTC 2023"
+    },
+    "result": {
+        "duration": 111.4931070804596,
+        "exit_code": 1,
+        "logs": "result.log",
+        "output": null,
+        "start": 1716792647.0084562
+    },
+    "runid": "20240527_0650",
+    "solc": "0.4.26",
+    "tool": {
+        "bin": "scripts",
+        "command": null,
+        "cpu_quota": null,
+        "entrypoint": "'$BIN/do_solidity.sh' '$FILENAME' '$TIMEOUT' '$BIN' '$MAIN'",
+        "id": "mythril-0.24.7",
+        "image": "smartbugs/mythril:0.24.7",
+        "info": "Mythril analyses EVM bytecode using symbolic analysis, taint analysis and control flow checking to detect a variety of security vulnerabilities.",
+        "mem_limit": null,
+        "mode": "solidity",
+        "name": "Mythril",
+        "origin": "https://github.com/ConsenSys/mythril",
+        "output": null,
+        "parser": "parser.py",
+        "solc": true,
+        "version": "0.24.7"
+    }
+}
