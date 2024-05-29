@@ -596,7 +596,7 @@ contract DSTContract is StandardToken{
         uint tokens = msg.value * etherPrice * DECIMAL_ZEROS / (1 ether);
         
         // check if demand of tokens is 
-        // overflow the supply 
+        // overflow the supply
         uint retEther = 0;
         if (balances[this] < tokens) {
             

@@ -573,7 +573,7 @@ contract MultiAssetProxy is
                     let amountsElement := calldataload(add(amountsContentsStart, i))
                     let totalAmount := mul(amountsElement, amount)
 
-                    // Revert if `amount` != 0 and multiplication resulted in an overflow 
+                    // Revert if `amount` != 0 and multiplication resulted in an overflow
                     if iszero(or(
                         iszero(amount),
                         eq(div(totalAmount, amount), amountsElement)

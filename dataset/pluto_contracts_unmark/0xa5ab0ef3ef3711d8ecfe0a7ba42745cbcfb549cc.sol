@@ -46,7 +46,7 @@ contract IERC20Token {
  * import "../common/SafeMath.sol" : start
  *************************************************************************/
 
-/**dev Utility methods for overflow-proof arithmetic operations 
+/**dev Utility methods for overflow-proof arithmetic operations
 */
 contract SafeMath {
 

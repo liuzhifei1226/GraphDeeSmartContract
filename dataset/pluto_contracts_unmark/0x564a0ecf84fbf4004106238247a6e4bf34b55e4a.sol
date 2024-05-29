@@ -43,20 +43,20 @@ contract Exchange {
         if (!assertion) throw;
     }
 
-    // Safe Multiply Function - prevents integer overflow 
+    // Safe Multiply Function - prevents integer overflow
     function safeMul(uint a, uint b) pure returns (uint) {
         uint c = a * b;
         assert(a == 0 || c / a == b);
         return c;
     }
 
-    // Safe Subtraction Function - prevents integer overflow 
+    // Safe Subtraction Function - prevents integer overflow
     function safeSub(uint a, uint b) pure returns (uint) {
         assert(b <= a);
         return a - b;
     }
 
-    // Safe Addition Function - prevents integer overflow 
+    // Safe Addition Function - prevents integer overflow
     function safeAdd(uint a, uint b) pure returns (uint) {
         uint c = a + b;
         assert(c>=a && c>=b);

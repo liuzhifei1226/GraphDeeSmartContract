@@ -1,4 +1,4 @@
-pragma solidity 0.4 .25;
+pragma solidity 0.4.25;
 /**
 *
 * X1.5INVEST - ETHEREUM FUND 4.2% - 6% 
