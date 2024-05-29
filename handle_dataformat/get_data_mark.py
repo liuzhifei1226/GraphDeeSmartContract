@@ -4,8 +4,8 @@ import csv
 import shutil
 import os
 from fuzzywuzzy import process
-vul_slither = ['reentrancy-eth', 'reentrancy-no-eth', 'tx-origin', 'reentrancy-benign', 'reentrancy-events', 'timestamp',
-       'reentrancy-unlimited-gas', 'controlled-delegatecall', 'delegatecall-loop']
+vul_slither = ['reentrancy_eth', 'reentrancy_no_eth', 'tx_origin', 'reentrancy_benign', 'reentrancy_events', 'timestamp',
+       'reentrancy_unlimited_gas', 'controlled_delegatecall', 'delegatecall_loop']
 
 vul_mythril = []
 # class Vulnerability(Enum):
