@@ -41,7 +41,7 @@ def mark():
                                    source_file_path = "../" + filename
 
                                    # 复制文件
-                                   shutil.copyfile(source_file_path, destination_file_path)
+                                   shutil.copy(source_file_path, destination_file_path)
 
 
 if __name__ == '__main__':
