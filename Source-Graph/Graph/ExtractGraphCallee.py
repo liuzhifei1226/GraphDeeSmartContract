@@ -215,7 +215,7 @@ def generate_graph(filepath):
                     withdrawName = withdrawNameTmp
                 else:
                     '''
-                    函数名后加左括号？
+                    函数名后加左括号
                     '''
                     withdrawName = withdrawNameTmp + "("
                 withdrawNameList.append(["W" + str(key_count), withdrawName])

@@ -129,13 +129,14 @@ class DataReader():
         data['num_features'] = num_features
         data['num_classes'] = num_classes
         self.data = data
-
+    #  解析txt文件
     def parse_txt_file(self, fpath, line_parse_fn=None):
         with open(pjoin(self.data_dir, fpath), 'r') as f:
             lines = f.readlines()
         data = [line_parse_fn(s) if line_parse_fn is not None else s for s in lines]
         return data
 
+    # 读取图的邻接矩阵
     def read_graph_adj(self, fpath, nodes, graphs):
         edges = self.parse_txt_file(fpath, line_parse_fn=lambda s: s.split(','))
         adj_dict = {}
@@ -154,6 +155,7 @@ class DataReader():
         adj_list = [adj_dict[graph_id] for graph_id in sorted(list(graphs.keys()))]
         return adj_list
 
+    # 读取图的节点关系
     def read_graph_nodes_relations(self, fpath):
         graph_ids = self.parse_txt_file(fpath, line_parse_fn=lambda s: int(s.rstrip()))
         nodes, graphs = {}, {}
@@ -168,6 +170,7 @@ class DataReader():
             graphs[graph_id] = np.array(graphs[graph_id])
         return nodes, graphs, unique_id
 
+    # 读取节点特征
     def read_node_features(self, fpath, nodes, graphs, fn):
         node_features_all = self.parse_txt_file(fpath, line_parse_fn=fn)
         node_features = {}
@@ -196,7 +199,7 @@ for fold_id in range(n_folds):
                             num_workers=args.threads, collate_fn=collate_batch)
         loaders.append(loader)
     print('FOLD {}, train {}, test {}'.format(fold_id, len(loaders[0].dataset), len(loaders[1].dataset)))
-
+    # 模型选择
     if args.model == 'gcn_modify':
         model = GCN_MODIFY(in_features=loaders[0].dataset.num_features,
                            out_features=loaders[0].dataset.num_classes,
@@ -224,12 +227,15 @@ for fold_id in range(n_folds):
 
     train_params = list(filter(lambda p: p.requires_grad, model.parameters()))
     print('N trainable parameters:', np.sum([p.numel() for p in train_params]))
+
+    # 优化器和学习率调度器
     optimizer = optim.Adam(train_params, lr=args.lr, betas=(0.5, 0.999), weight_decay=args.wd)
     scheduler = lr_scheduler.MultiStepLR(optimizer, args.lr_decay_steps, gamma=0.1)  # dynamic adjustment lr
     # loss_fn = F.nll_loss  # when model is gcn_origin or gat, use this
     loss_fn = F.cross_entropy  # when model is gcn_modify, use this
 
 
+    # 训练函数
     def train(train_loader):
         scheduler.step()
         model.train()
@@ -255,6 +261,7 @@ for fold_id in range(n_folds):
         # torch.save(model, 'Smartcheck.pth')
 
 
+    # 测试函数
     def test(test_loader):
         model.eval()
         start = time.time()
@@ -338,6 +345,7 @@ for fold_id in range(n_folds):
         return accuracy, recall, precision, F1, FPR
 
 
+    # 进行多个epoch的训练和测试
     for epoch in range(args.epochs):
         train(loaders[0])
     accuracy, recall, precision, F1, FPR = test(loaders[1])

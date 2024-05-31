@@ -21,12 +21,12 @@ def mark():
        # 目标文件夹路径
        reentrancy_path = "../dataset/vul_kinds_marked/reentrancy-pluto-newmark"
        timestamp_path = "../dataset/vul_kinds_marked/timestamp-pluto-newmark"
-       tx_origin__path = "../dataset/vul_kinds_marked/tx-origin-pluto-newmark"
+       tx_origin_path = "../dataset/vul_kinds_marked/tx-origin-pluto-newmark"
        delegatecall_path = "../dataset/vul_kinds_marked/delegatecall-pluto-newmark"
-       path_list = [reentrancy_path, timestamp_path, tx_origin__path, delegatecall_path]
+       path_list = [reentrancy_path, timestamp_path, tx_origin_path, delegatecall_path]
        # 读取CSV文件并复制文件
        # CSV文件路径
-       csv_file_path = "../dataset/slither_results.csv"  # 替换为您的CSV文件路径
+       csv_file_path = "../dataset/slither_results_7799.csv"  # 替换为您的CSV文件路径
        with open(csv_file_path, 'r') as file:
               reader = csv.reader(file)
               for row in reader:

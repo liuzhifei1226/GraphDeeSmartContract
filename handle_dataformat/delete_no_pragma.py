@@ -1,7 +1,7 @@
 import os
 
 # 定义文件夹路径
-folder_path = '../dataset/pluto_contracts_unmark'
+folder_path = '../dataset/xfuzz_contracts_unmark'
 
 files_to_delete = []
 
