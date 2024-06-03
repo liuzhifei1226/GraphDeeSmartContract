@@ -1,13 +1,24 @@
 import numpy as np
 
+'''
+用于将标签列表labels转换为独热编码形式。具体步骤如下：
 
+    获取标签的唯一类别classes。
+    创建一个字典classes_dict，将每个类别映射到一个独热向量。
+    使用map函数将标签列表转换为独热向量，并转换为NumPy数组。
+    返回独热编码后的标签数组。
+'''
 def encode_one_hot(labels):
     classes = set(labels)
     classes_dict = {c: np.identity(len(classes))[i, :] for i, c in enumerate(classes)}
     labels_one_hot = np.array(list(map(classes_dict.get, labels)), dtype=np.int32)
     return labels_one_hot
 
-
+'''
+varOP_sentence, edgeOP_sentence, nodeOP_sentence, nodeAC_sentence, node_sentence, var_sentence, sn_sentence: 存储每个类别的索引。
+varOP_vectors, edgeOP_vectors, nodeOP_vectors, nodeAC_vectors, node_vectors, var_vectors, sn_vectors: 存储每个类别对应的独热向量。
+nodelist, edgeOPlist, varOPlist, nodeOplist, varlist, snlist, aclist: 定义了各个类别的标签名称列表。
+'''
 class vec2onehot:
     varOP_sentence = []
     edgeOP_sentence = []
@@ -40,6 +51,9 @@ class vec2onehot:
     # Access control
     aclist = ['NULL', 'LimitedAC', 'NoLimit']
 
+    # 初始化各个类别的索引列表。
+    # 创建各个类别标签到索引的映射字典。
+    # 调用各个转换函数，将标签映射到独热向量。
     def __init__(self):
         for i in range(len(self.nodelist)):
             self.node_sentence.append(i + 1)
@@ -69,6 +83,9 @@ class vec2onehot:
         self.varOP2vec()
         self.nodeOP2vec()
         self.nodeAC2vec()
+
+
+# 输出向量字典中每个标签及其对应的独热向量。
 
     def output_vec(self, vectors):
         for node, vec in vectors.items():
@@ -136,3 +153,13 @@ class vec2onehot:
 
     def nodeAC2vecEmbedding(self, nodeAC):
         return self.nodeAC_vectors[nodeAC]
+
+'''
+用法：
+# 创建 vec2onehot 对象
+encoder = vec2onehot()
+
+# 获取某个节点标签的独热向量
+node_vector = encoder.node2vec
+
+'''

@@ -6,6 +6,8 @@ from vec2onehot import vec2onehot
 """
 S, W, C nips_features: Node nips_features + Edge nips_features + Var nips_features;
 节点自身属性 + 入变量 + 出变量 + 入边 + 出边
+
+将特定的属性名称转换为整数编码
 """
 
 dict_AC = {"NULL": 0, "LimitedAC": 1, "NoLimit": 2}
@@ -32,7 +34,7 @@ node_convert = {"S": 0, "W0": 1, "C0": 2, "W1": 3, "C1": 4, "W2": 5, "C2": 6, "W
 v2o = vec2onehot()  # create the one-bot dicts
 
 
-# 从输入文件中提取每个节点的nips_features #
+# 从输入文件中提取每个节点的属性 #
 def extract_node_features(nodeFile):
     nodeNum = 0
     node_list = []
@@ -58,7 +60,7 @@ def extract_node_features(nodeFile):
     return nodeNum, node_list, node_attribute_list
 
 
-# 子图形的消除过程 #
+# 消除子图中的冗余节点
 def elimination_node(node_attribute_list):
     main_point = ['S', 'W0', 'W1', 'W2', 'W3', 'W4', 'C0', 'C1', 'C2', 'C3', 'C4']
     extra_var_list = []  # extract var with low priority
@@ -80,7 +82,7 @@ def elimination_node(node_attribute_list):
                             extra_var_list.append(node_attribute_list.pop(i + 1))
     return node_attribute_list, extra_var_list
 
-
+# 将节点的属性进行嵌入编码
 def embedding_node(node_attribute_list):
     # embedding each callee_node after elimination #
     node_encode = []
@@ -136,7 +138,7 @@ def embedding_node(node_attribute_list):
 
     return node_encode, var_encode, node_embedding, var_embedding
 
-
+# 消除多余的边
 def elimination_edge(edgeFile):
     # eliminate callee_edge #
     edge_list = []  # all callee_edge
@@ -170,9 +172,9 @@ def elimination_edge(edgeFile):
 
     return edge_list, extra_edge_list
 
-
+# 对边进行属性嵌入编码
 def embedding_edge(edge_list):
-    # extract & embedding the nips_features of each callee_edge from input file #
+
     edge_encode = []
     edge_embedding = []
 
@@ -197,10 +199,9 @@ def embedding_edge(edge_list):
 
     return edge_encode, edge_embedding
 
-
+# 构建节点和边的向量表示，结合节点的自属性、入变量、出变量、入边、出边：
 def construct_vec(edge_list, node_embedding, var_embedding, edge_embedding, edge_encode):
-    # Vec: Node self property + Incoming Var + Outgoing Var + Incoming Edge + Outgoing Edge
-    print("Start constructing callee_node vector...")
+    print("开始构建被调用合约图节点向量...")
     var_in_node = []
     var_in = []
     var_out_node = []

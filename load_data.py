@@ -65,14 +65,10 @@ class GraphData(torch.utils.data.Dataset):
                 int(self.ids[index])  # graph id
                 ]
 
-
-def collate_batch(batch):
-    """
-    Creates a batch of same size graphs by zero-padding callee_node features and adjacency matrices up to
-    the maximum number of nodes in the CURRENT batch rather than in the entire dataset.
-    Graphs in the batches are usually much smaller than the largest graph in the dataset, so this method is fast.
-    :param batch: [node_features * batch_size, A * batch_size, label * batch_size]
-    :return: [node_features, A, graph_support, N_nodes, label]
+'''
+    通过零填充 callee_node 特征和邻接矩阵创建一批相同大小的图
+    当前批次中而不是整个数据集中的最大节点数。
+    批次中的图通常比数据集中最大的图小得多，因此该方法速度很快。
     collate_batch函数用于将一个批次的数据转换为统一大小的张量，主要步骤包括：
 
     获取批次的大小B和每个图的节点数N_nodes。
@@ -81,8 +77,8 @@ def collate_batch(batch):
     初始化零填充的张量graph_support、邻接矩阵A和节点特征x。
     将每个图的数据填充到对应的张量中。
     将节点数、标签和ID转换为张量并返回。
-
-    """
+'''
+def collate_batch(batch):
     B = len(batch)
     N_nodes = [len(batch[b][1]) for b in range(B)]
     C = batch[0][0].shape[1]
@@ -101,3 +97,23 @@ def collate_batch(batch):
     ids = torch.from_numpy(np.array([batch[b][3] for b in range(B)])).long()
 
     return [x, A, graph_support, N_nodes, labels, ids]
+
+
+'''
+使用示例：
+from torch.utils.data import DataLoader
+
+# 创建数据集对象
+train_data = GraphData(datareader=datareader, fold_id=0, split='train')
+test_data = GraphData(datareader=datareader, fold_id=0, split='test')
+
+# 创建数据加载器
+train_loader = DataLoader(train_data, batch_size=32, collate_fn=collate_batch)
+test_loader = DataLoader(test_data, batch_size=32, collate_fn=collate_batch)
+
+# 迭代加载数据
+for batch in train_loader:
+    node_features, adj_matrix, graph_support, n_nodes, labels, ids = batch
+    # 在这里进行训练
+
+'''
