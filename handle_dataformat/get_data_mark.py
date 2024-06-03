@@ -93,7 +93,7 @@ def rename_files_in_folder(folder_path, new_prefix):
     # 遍历文件夹中的所有文件
     for index, filename in enumerate(os.listdir(folder_path)):
         # 构造新的文件名
-        new_filename = f"{new_prefix}_{index + 1}.sol"  # 这里假设重命名后的文件都是以 .txt 结尾的
+        new_filename = f"{new_prefix}_{index + 1}.sol"
 
         # 构造文件的完整路径
         old_filepath = os.path.join(folder_path, filename)
