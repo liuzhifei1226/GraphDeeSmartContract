@@ -30,7 +30,7 @@ def slither_mark():
     path_list = [reentrancy_path, timestamp_path, tx_origin_path, delegatecall_path]
     # 读取CSV文件并复制文件
     # CSV文件路径
-    csv_file_path = "../dataset/slither_results_7799.csv"  # 替换为您的CSV文件路径
+    csv_file_path = "../dataset/slither_results_7799.csv"
     with open(csv_file_path, 'r') as file:
         reader = csv.reader(file)
         for row in reader:
