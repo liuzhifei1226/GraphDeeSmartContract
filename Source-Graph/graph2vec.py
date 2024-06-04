@@ -31,7 +31,7 @@ dict_ConName = {"NULL": 0, "ARG1": 1, "ARG2": 2, "ARG3": 3, "CON1": 4, "CON2": 5
 node_convert = {"S": 0, "W0": 1, "C0": 2, "W1": 3, "C1": 4, "W2": 5, "C2": 6, "W3": 7, "C3": 8, "W4": 9, "C4": 10,
                 "VAR0": 0, "VAR1": 1, "VAR2": "VAR2", "VAR3": "VAR3", "VAR4": "VAR4", "VAR5": "VAR5"}
 
-v2o = vec2onehot()  # create the one-bot dicts
+v2o = vec2onehot()  # 创建one-hot字典
 
 
 # 从输入文件中提取每个节点的属性 #
@@ -62,29 +62,31 @@ def extract_node_features(nodeFile):
 
 # 消除子图中的冗余节点
 def elimination_node(node_attribute_list):
+    print("=========node_attribute_list before elimination======:", node_attribute_list)
     main_point = ['S', 'W0', 'W1', 'W2', 'W3', 'W4', 'C0', 'C1', 'C2', 'C3', 'C4']
-    extra_var_list = []  # extract var with low priority
+    extra_var_list = []  # 提取低优先级var
     for i in range(0, len(node_attribute_list)):
         if node_attribute_list[i][1] not in main_point:
             if i + 1 < len(node_attribute_list):
                 if node_attribute_list[i][1] == node_attribute_list[i + 1][1]:
-                    loc1 = int(node_attribute_list[i][3])  # relative location
-                    op1 = node_attribute_list[i][4]  # operation
+                    loc1 = int(node_attribute_list[i][3])  # 相对位置
+                    op1 = node_attribute_list[i][4]  # 运算
                     loc2 = int(node_attribute_list[i + 1][3])
                     op2 = node_attribute_list[i + 1][4]
                     if loc2 - loc1 == 1:
                         op1_index = dict_VarOpName[op1]
                         op2_index = dict_VarOpName[op2]
-                        # extract callee_node attribute based on priority
+                        # 基于优先级提取被调用节点属性
                         if op1_index < op2_index:
                             extra_var_list.append(node_attribute_list.pop(i))
                         else:
                             extra_var_list.append(node_attribute_list.pop(i + 1))
+    print("=========node_attribute_list after elimination======:", node_attribute_list)
     return node_attribute_list, extra_var_list
 
 # 将节点的属性进行嵌入编码
 def embedding_node(node_attribute_list):
-    # embedding each callee_node after elimination #
+    # 消除后嵌入每个被调用合约的节点 #
     node_encode = []
     var_encode = []
     node_embedding = []
@@ -93,14 +95,15 @@ def embedding_node(node_attribute_list):
 
     for j in range(0, len(node_attribute_list)):
         v = node_attribute_list[j][0]
+        print("====node_attribute_list[j]======", node_attribute_list[j])
         if v in main_point:
             vf0 = node_attribute_list[j][0]
-            vf1 = dict_NodeName[node_attribute_list[j][1]]
-            vfm1 = v2o.node2vecEmbedding(node_attribute_list[j][1])
-            vf2 = dict_AC[node_attribute_list[j][2]]
-            vfm2 = v2o.nodeAC2vecEmbedding(node_attribute_list[j][2])
+            # vf1 = dict_NodeName[node_attribute_list[j][1]]
+            # vfm1 = v2o.node2vecEmbedding(node_attribute_list[j][1])
+            vf1 = dict_AC[node_attribute_list[j][1]]
+            vfm1 = v2o.nodeAC2vecEmbedding(node_attribute_list[j][1])
 
-            result = node_attribute_list[j][3].split(",")
+            result = node_attribute_list[j][2].split(",")
             for call_vec in range(len(result)):
                 if call_vec + 1 < len(result):
                     tmp_vf = str(dict_NodeName[result[call_vec]]) + "," + str(dict_NodeName[result[call_vec + 1]])
@@ -109,12 +112,16 @@ def embedding_node(node_attribute_list):
                 elif len(result) == 1:
                     tmp_vf = dict_NodeName[result[call_vec]]
                     tmp_vfm = v2o.node2vecEmbedding(result[call_vec])
-            vf3 = tmp_vf
-            vfm3 = tmp_vfm
-            vf4 = int(node_attribute_list[j][4])
-            vfm4 = v2o.sn2vecEmbedding(node_attribute_list[j][4])
-            vf5 = dict_NodeOpName[node_attribute_list[j][5]]
-            vfm5 = v2o.nodeOP2vecEmbedding(node_attribute_list[j][5])
+            vf2 = tmp_vf
+            vfm2 = tmp_vfm
+            vf3 = int(node_attribute_list[j][3])
+            vfm3 = v2o.sn2vecEmbedding(node_attribute_list[j][3])
+            vf4 = dict_NodeOpName[node_attribute_list[j][4]]
+            vfm4 = v2o.nodeOP2vecEmbedding(node_attribute_list[j][4])
+            # 新增  依赖关系向量转化
+            vf5 = int(node_attribute_list[j][5])
+            vfm5 = v2o.depend2vecEmbedding(node_attribute_list[j][5])
+
             nodeEmbedding = vfm1.tolist() + vfm2.tolist() + vfm3.tolist() + vfm4.tolist() + vfm5.tolist()
             node_embedding.append([vf0, np.array(nodeEmbedding)])
             temp = [vf1, vf2, vf3, vf4, vf5]
@@ -140,9 +147,9 @@ def embedding_node(node_attribute_list):
 
 # 消除多余的边
 def elimination_edge(edgeFile):
-    # eliminate callee_edge #
-    edge_list = []  # all callee_edge
-    extra_edge_list = []  # eliminated callee_edge
+    # 消除被调用合约的多余边 #
+    edge_list = []  # 所有边
+    extra_edge_list = []  # 被消除的边
 
     f = open(edgeFile)
     lines = f.readlines()
@@ -152,11 +159,11 @@ def elimination_edge(edgeFile):
         edge = list(map(str, line.split()))
         edge_list.append(edge)
 
-    # 消融两个节点之间的多个边缘，取边缘操作优先的边缘
+    # 消融两个节点之间的多个边
     for k in range(0, len(edge_list)):
         if k + 1 < len(edge_list):
-            start1 = edge_list[k][0]  # start callee_node
-            end1 = edge_list[k][1]  # end callee_node
+            start1 = edge_list[k][0]  # 开始节点
+            end1 = edge_list[k][1]  # 结束节点
             op1 = edge_list[k][4]
             start2 = edge_list[k + 1][0]
             end2 = edge_list[k + 1][1]
@@ -179,9 +186,9 @@ def embedding_edge(edge_list):
     edge_embedding = []
 
     for k in range(len(edge_list)):
-        start = edge_list[k][0]  # start callee_node
-        end = edge_list[k][1]  # end callee_node
-        a, b, c = edge_list[k][2], edge_list[k][3], edge_list[k][4]  # origin info
+        start = edge_list[k][0]  # 开始节点
+        end = edge_list[k][1]  # 结束节点
+        a, b, c = edge_list[k][2], edge_list[k][3], edge_list[k][4]  # 原始信息
 
         ef1 = dict_NodeName[a]
         ef2 = int(b)
@@ -349,7 +356,7 @@ def construct_vec(edge_list, node_embedding, var_embedding, edge_embedding, edge
     for i in range(len(node_vec)):
         node_vec[i][1] = node_vec[i][1].tolist()
 
-    print("Node Vec:")
+    print("节点 vec:")
     for i in range(len(node_vec)):
         node_vec[i][0] = node_convert[node_vec[i][0]]
         print(node_vec[i][0], node_vec[i][1])
@@ -383,7 +390,7 @@ def construct_vec(edge_list, node_embedding, var_embedding, edge_embedding, edge
             elif 'W' in start1 and 'VAR' in end1:
                 edge_encode[i][1] = 'S'
 
-    print("Edge Vec:")
+    print("边 Vec:")
     for i in range(len(edge_encode)):
         edge_encode[i][0] = node_convert[edge_encode[i][0]]
         edge_encode[i][1] = node_convert[edge_encode[i][1]]
@@ -400,8 +407,8 @@ def construct_vec(edge_list, node_embedding, var_embedding, edge_embedding, edge
 
 
 if __name__ == "__main__":
-    node = "./graph_data/callee_node/SimpleDAO.sol"
-    edge = "./graph_data/callee_callee_edge/SimpleDAO.sol"
+    node = "../graph_data/callee_node/SimpleDAO.sol"
+    edge = "../graph_data/callee_edge/SimpleDAO.sol"
     nodeNum, node_list, node_attribute_list = extract_node_features(node)
     node_attribute_list, extra_var_list = elimination_node(node_attribute_list)
     node_encode, var_encode, node_embedding, var_embedding = embedding_node(node_attribute_list)

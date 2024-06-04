@@ -11,19 +11,19 @@ import numpy as np
 根据测试集构造训练集train_ids，每个训练集不包含对应的测试集数据。
 返回训练集和测试集的划分。
 '''
-# split train and test
+# 分割训练集和测试集
 def split_ids(ids, folds):
     n = len(ids)
     stride = int(np.ceil(n / float(folds)))
     test_ids = [ids[i: i + stride] for i in range(0, n, stride)]
     assert np.all(
-        np.unique(np.concatenate(test_ids)) == sorted(ids)), 'some graphs are missing in the test sets'
-    assert len(test_ids) == folds, 'invalid test sets'
+        np.unique(np.concatenate(test_ids)) == sorted(ids)), '测试集中缺少一些图'
+    assert len(test_ids) == folds, '无效测试集'
     train_ids = []
     for fold in range(folds):
         train_ids.append(np.array([e for e in ids if e not in test_ids[fold]]))
         assert len(train_ids[fold]) + len(test_ids[fold]) == len(
-            np.unique(list(train_ids[fold]) + list(test_ids[fold]))) == n, 'invalid splits'
+            np.unique(list(train_ids[fold]) + list(test_ids[fold]))) == n, '无效分割'
 
     return train_ids, test_ids
 
@@ -90,7 +90,7 @@ def collate_batch(batch):
     for b in range(B):
         x[b, :N_nodes[b]] = batch[b][0]
         A[b, :N_nodes[b], :N_nodes[b]] = batch[b][1]
-        graph_support[b][:N_nodes[b]] = 1  # mask with values of 0 for dummy (zero padded) nodes, otherwise 1
+        graph_support[b][:N_nodes[b]] = 1  # 掩码的值为0，用于虚设（零填充）节点，否则为1
 
     N_nodes = torch.from_numpy(np.array(N_nodes)).long()
     labels = torch.from_numpy(np.array([batch[b][2] for b in range(B)])).long()

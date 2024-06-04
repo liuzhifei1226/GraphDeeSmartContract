@@ -27,6 +27,7 @@ class vec2onehot:
     node_sentence = []
     var_sentence = []
     sn_sentence = []
+    depend_sentence = []
     varOP_vectors = {}
     edgeOP_vectors = {}
     nodeOP_vectors = {}
@@ -34,6 +35,7 @@ class vec2onehot:
     node_vectors = {}
     var_vectors = {}
     sn_vectors = {}
+    depend_vectors = {}
     # map user-defined variables (internal state) to symbolic names (e.g.,“VAR1”, “VAR2”) in the one-to-one fashion.
     nodelist = ['NULL', 'VAR0', 'VAR1', 'VAR2', 'VAR3', 'VAR4', 'VAR4', 'S', 'W0', 'W1', 'W2',
                 'W3', 'W4', 'C0', 'C1', 'C2', 'C3', 'C4']
@@ -48,6 +50,9 @@ class vec2onehot:
     varlist = ['ARG1', 'ARG2', 'ARG3', 'ARG4', 'ARG5', 'CON1', 'CON2', 'CON3', 'CNS1', 'CNS2', 'CNS3']
     # this notation (SN) is to show the execution order
     snlist = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+
+    # 依赖关系
+    dependlist = ['-1', '0', '1']
     # Access control
     aclist = ['NULL', 'LimitedAC', 'NoLimit']
 
@@ -61,6 +66,8 @@ class vec2onehot:
             self.var_sentence.append(i + 1)
         for i in range(len(self.snlist)):
             self.sn_sentence.append(i + 1)
+        for i in range(len(self.dependlist)):
+            self.depend_sentence.append(i + 1)
         for i in range(len(self.edgeOPlist)):
             self.edgeOP_sentence.append(i + 1)
         for i in range(len(self.varOPlist)):
@@ -72,11 +79,13 @@ class vec2onehot:
         self.node_dict = dict(zip(self.nodelist, self.node_sentence))
         self.var_dict = dict(zip(self.varlist, self.var_sentence))
         self.sn_dict = dict(zip(self.snlist, self.sn_sentence))
+        self.depend_dict = dict(zip(self.dependlist, self.depend_sentence))
         self.varOP_dict = dict(zip(self.varOPlist, self.varOP_sentence))
         self.edgOP_dict = dict(zip(self.edgeOPlist, self.edgeOP_sentence))
         self.nodeAC_dict = dict(zip(self.aclist, self.nodeAC_sentence))
         self.nodeOP_dict = dict(zip(self.nodeOplist, self.nodeOP_sentence))
         self.sn2vec()
+        self.depend2vec()
         self.node2vec()
         self.edgeOP2vec()
         self.var2vec()
@@ -117,6 +126,15 @@ class vec2onehot:
 
     def sn2vecEmbedding(self, sn):
         return self.sn_vectors[sn]
+
+    def depend2vec(self):
+        for word, index in self.depend_dict.items():
+            node_array = np.zeros(len(self.dependlist), dtype=int)
+            self.depend_vectors[word] = node_array
+            self.depend_vectors[word][index - 1] = 1.0
+
+    def depend2vecEmbedding(self, sn):
+        return self.depend_vectors[sn]
 
     def edgeOP2vec(self):
         for word, index in self.edgOP_dict.items():

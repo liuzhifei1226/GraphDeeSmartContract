@@ -37,7 +37,7 @@ print('Loading training_data...')
 
 class DataReader():
     """
-    Class to read the txt files containing all training_data of the dataset
+    读取训练数据集的所有txt文件
     """
 
     def __init__(self, data_dir, rnd_state=None, use_cont_node_attr=False, folds=n_folds):
@@ -61,21 +61,21 @@ class DataReader():
                                                    fn=lambda s: np.array(list(map(float, s.strip().split(',')))))
         features, n_edges, degrees = [], [], []
         for sample_id, adj in enumerate(data['adj_list']):
-            N = len(adj)  # number of nodes
+            N = len(adj)  # 节点数量
             if data['features'] is not None:
                 assert N == len(data['features'][sample_id]), (N, len(data['features'][sample_id]))
-            n = np.sum(adj)  # total sum of edges
-            # assert n % 2 == 0, n
-            n_edges.append(int(n / 2))  # undirected edges, so need to divide by 2
+            n = np.sum(adj)  # 边的总数
+            # 需要 n % 2 == 0, n
+            n_edges.append(int(n / 2))  # 无向边，需要除以2
             if not np.allclose(adj, adj.T):
                 print(sample_id, 'not symmetric')
             degrees.extend(list(np.sum(adj, 1)))
             features.append(np.array(data['features'][sample_id]))
 
-        # Create features over graphs as one-hot vectors for each callee_node
+        # 将图形上的特征创建为每个被调用节点的一个热向量
         features_all = np.concatenate(features)
         features_min = features_all.min()
-        num_features = int(features_all.max() - features_min + 1)  # number of possible values
+        num_features = int(features_all.max() - features_min + 1)  # 可能值的数量
 
         features_onehot = []
         for i, x in enumerate(features):
@@ -90,8 +90,8 @@ class DataReader():
             num_features = features_onehot[0].shape[1]
 
         shapes = [len(adj) for adj in data['adj_list']]
-        labels = data['targets']  # graph class labels
-        labels -= np.min(labels)  # to start from 0
+        labels = data['targets']  # 图 类标签
+        labels -= np.min(labels)  # 从0 开始
 
         classes = np.unique(labels)
         num_classes = len(classes)
@@ -111,13 +111,13 @@ class DataReader():
         for u in np.unique(features_all):
             print('feature {}, count {}/{}'.format(u, np.count_nonzero(features_all == u), len(features_all)))
 
-        N_graphs = len(labels)  # number of samples (graphs) in training_data
+        N_graphs = len(labels)  # training_data中的样本（图）数
         assert N_graphs == len(data['adj_list']) == len(features_onehot), 'invalid training_data'
 
-        # Create test sets first
+        # 先创建测试集
         train_ids, test_ids = split_ids(rnd_state.permutation(N_graphs), folds=folds)
 
-        # Create train sets
+        # 创建训练集
         splits = []
         for fold in range(folds):
             splits.append({'train': train_ids[fold], 'test': test_ids[fold]})
@@ -189,7 +189,7 @@ class DataReader():
 datareader = DataReader(data_dir='./training_data/%s/' % args.dataset, rnd_state=rnd_state,
                         use_cont_node_attr=args.use_cont_node_attr, folds=args.folds)
 
-# train and test
+# 训练和测试
 result_folds = []
 for fold_id in range(n_folds):
     loaders = []
