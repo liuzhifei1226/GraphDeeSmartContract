@@ -199,10 +199,10 @@ def generate_graph(filepath):
                         if param_count == 0:
                             node_feature_list.append(
                                 ["S", "NoLimit", ["W" + str(key_count)],
-                                 2, "INNADD"])
+                                 2, "INNADD", 0])
                             node_feature_list.append(
                                 ["W" + str(key_count), "NoLimit", [],
-                                 1, "NULL", ])
+                                 1, "NULL", 1])
                             # 添加边的数据依赖  数据
                             # edgeDataDepend.append(["S", "W" + str(key_count), "address"])
 
@@ -276,7 +276,7 @@ def generate_graph(filepath):
             node_feature_list.append(["C0", "NoLimit", ["NULL"], 0, "NULL", 0])
             for n in range(len(node_feature_list)):
                 if "W" in node_feature_list[n][0]:
-                    node_feature_list[n][3] = ["NULL"]
+                    node_feature_list[n][2] = ["NULL"]
         print("===node_feature_list====:\n", node_feature_list)
         # ---------------------------  处理边  ----------------------------
 
@@ -753,27 +753,28 @@ def printResult(file, node_feature, edge_feature):
     print("print result: =====node_feature=======\n", node_feature)
     for i in range(len(node_feature)):
         if node_feature[i][0] in main_point:
-            for j in range(0, len(node_feature[i][3]), 2):
-                if j + 1 < len(node_feature[i][3]):
-                    tmp = node_feature[i][3][j] + "," + node_feature[i][3][j + 1]
-                elif len(node_feature[i][3]) == 1:
-                    tmp = node_feature[i][3][j]
+            tmp = ""
+            for j in range(0, len(node_feature[i][2]), 2):
+                if j + 1 < len(node_feature[i][2]):
+                    tmp += node_feature[i][2][j] + "," + node_feature[i][2][j + 1] + " "
+                elif len(node_feature[i][2]) == 1:
+                    tmp = node_feature[i][2][j]
 
-            node_feature[i][3] = tmp
+            node_feature[i][2] = tmp.strip()
 
     nodeOutPath = "../graph_data/callee_node/" + file
-    edgeOutPath = "../graph_data/callee_callee_edge/" + file
+    edgeOutPath = "../graph_data/callee_edge/" + file
 
     f_node = open(nodeOutPath, 'a')
-    for i in range(len(node_feature)):
-        result = " ".join(np.array(node_feature[i]))
+    for feature in node_feature:
+        result = " ".join(map(str, feature))
         f_node.write(result + '\n')
     f_node.close()
 
     f_edge = open(edgeOutPath, 'a')
-    for i in range(len(edge_feature)):
+    for edge in edge_feature:
         print("iiiiiiii", i)
-        result = " ".join(np.array(edge_feature[i]))
+        result = " ".join(map(str, edge))
         print(result)
         f_edge.write(result + '\n')
     f_edge.close()

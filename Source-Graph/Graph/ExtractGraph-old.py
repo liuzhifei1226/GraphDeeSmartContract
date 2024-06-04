@@ -717,7 +717,7 @@ def generate_graph(filepath):
 
 def printResult(file, node_feature, edge_feature):
     main_point = ['S', 'W0', 'W1', 'W2', 'W3', 'W4', 'C0', 'C1', 'C2', 'C3', 'C4']
-
+    print("print result: =====node_feature=======\n", node_feature)
     for i in range(len(node_feature)):
         if node_feature[i][0] in main_point:
             for j in range(0, len(node_feature[i][3]), 2):
@@ -728,8 +728,8 @@ def printResult(file, node_feature, edge_feature):
 
             node_feature[i][3] = tmp
 
-    nodeOutPath = "./graph_data/callee_node/" + file
-    edgeOutPath = "./graph_data/callee_callee_edge/" + file
+    nodeOutPath = "../graph_data/callee_node/" + file
+    edgeOutPath = "../graph_data/callee_edge/" + file
 
     f_node = open(nodeOutPath, 'a')
     for i in range(len(node_feature)):
@@ -748,7 +748,7 @@ def printResult(file, node_feature, edge_feature):
 
 
 if __name__ == "__main__":
-    test_contract = "./source_code/test2.sol"
+    test_contract = "../source_code/SimpleDAO.sol"
     node_feature, edge_feature = generate_graph(test_contract)
     node_feature = sorted(node_feature, key=lambda x: (x[0]))
     edge_feature = sorted(edge_feature, key=lambda x: (x[2], x[3]))
