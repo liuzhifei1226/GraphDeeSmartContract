@@ -1,0 +1,3 @@
+S VAR0 S 3 FW
+W0 S W0 1 FW
+W1 S W1 1 IF
