@@ -13,11 +13,7 @@ vul_mythril = ['Integer_Arithmetic_Bugs_SWC_101', 'Delegatecall_to_user_supplied
                'Dependence_on_tx_origin_SWC_115', 'Dependence_on_predictable_environment_variable_SWC_116']
 
 
-# class Vulnerability(Enum):
-#     REENTRANCY_ETH = 1
-#     REENTRANCY_NO_ETH = 1
-
-
+# 标记slither检测的文件并移动到对应的文件夹内
 def slither_mark():
     # 源文件夹路径
     # source_folder = "../dataset/pluto_contracts_unmark"
@@ -47,7 +43,7 @@ def slither_mark():
                     # 复制文件
                     shutil.copy(source_file_path, destination_file_path)
 
-
+# 标记mythril检测的文件并移动到对应的文件夹内
 def mythril_mark():
     # 源文件夹路径
     # source_folder = "../dataset/pluto_contracts_unmark"
@@ -103,7 +99,24 @@ def rename_files_in_folder(folder_path, new_prefix):
         os.rename(old_filepath, new_filepath)
         print(f"重命名文件 '{old_filepath}' 为 '{new_filepath}'")
 
+# 统计数据集中有漏洞和无漏洞标签数
+def check_col_num():
+
+    count = 0
+    for root, dirs, files in os.walk("../Source2Graph/graph_data/reentrancy/callee_node"):
+        for file in files:
+            file_path = os.path.join(root, file)
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    lines = f.readlines()
+                    line_count = len(lines)
+                    if line_count > 3:
+                        count += 1
+            except Exception as e:
+                print(f"无法读取文件 {file_path}：{e}")
+    print("count:", count)
 
 if __name__ == '__main__':
     # mythril_mark()
-    rename_files_in_folder("../dataset/vul_kinds_marked/tx-origin-solidify", "solidifi_buggy_txorigin")
+    # rename_files_in_folder("../dataset/vul_kinds_marked/tx-origin-solidify", "solidifi_buggy_txorigin")
+    check_col_num()

@@ -1,6 +1,8 @@
 import Source2Graph.Graph.ExtractGraphCallee
+import Source2Graph.graph2vec
 import os
 import numpy as np
+import Source2Graph
 
 
 def list_files_in_directory(directory_path):
@@ -26,8 +28,8 @@ def source2graph(directory_path, filelist):
             continue
 
 def source2vec(graphdata_path):
-    node_path = graphdata_path + "callee_node"
-    edge_path = graphdata_path + "callee_edge"
+    node_path = graphdata_path + "callee_node/"
+    edge_path = graphdata_path + "callee_edge/"
 
     # 构造数据
     graphs = [
@@ -53,85 +55,85 @@ def source2vec(graphdata_path):
         }
     ]
 
-    file_line_counts = {}
-    for root, dirs, files in os.walk(directory_path):
+
+    for root, dirs, files in os.walk(node_path):
         for file in files:
             file_path = os.path.join(root, file)
             try:
-                with open(file_path, 'r', encoding='utf-8') as f:
-                    lines = f.readlines()
-                    line_count = len(lines)
-                    file_line_counts[file_path] = line_count
+                node_vec, graph_edge = Source2Graph.graph2vec.getVec(file)
+                print(f"node_vec: {node_vec}")
+                print(f"graph_edge: {graph_edge}")
+
             except Exception as e:
-                print(f"无法读取文件 {file_path}：{e}")
-    return file_line_counts
+                print(f"转换向量失败 {file_path}：{e}")
+
 
     # 文件初始化
-    edges = []
-    graph_indicator = []
-    graph_labels = []
-    node_labels = []
-    edge_labels = []
-    node_attributes = []
-    edge_attributes = []
-    graph_attributes = []
-
-    node_id = 1
-    for graph_id, graph in enumerate(graphs, start=1):
-        # 处理图的标签
-        graph_labels.append(graph['label'])
-        graph_attributes.append(graph.get('graph_attributes', ''))
-
-        for node in graph['nodes']:
-            # 处理节点的图指示符
-            graph_indicator.append(graph_id)
-            # 处理节点的标签
-            if 'node_labels' in graph:
-                node_labels.append(graph['node_labels'][node])
-            # 处理节点的属性
-            if 'node_attributes' in graph:
-                node_attributes.append(','.join(map(str, graph['node_attributes'][node])))
-
-        for edge, (src, dst) in enumerate(graph['edges']):
-            # 处理边
-            edges.append((node_id + src, node_id + dst))
-            edges.append((node_id + dst, node_id + src))
-            # 处理边的标签
-            if 'edge_labels' in graph:
-                edge_labels.append(graph['edge_labels'][edge])
-                edge_labels.append(graph['edge_labels'][edge])
-            # 处理边的属性
-            if 'edge_attributes' in graph:
-                edge_attributes.append(','.join(map(str, graph['edge_attributes'][edge])))
-                edge_attributes.append(','.join(map(str, graph['edge_attributes'][edge])))
-
-        node_id += len(graph['nodes'])
-
-    # 保存文件
-    np.savetxt('DS_A.txt', edges, fmt='%d')
-    np.savetxt('DS_graph_indicator.txt', graph_indicator, fmt='%d')
-    np.savetxt('DS_graph_labels.txt', graph_labels, fmt='%d')
-
-    if node_labels:
-        np.savetxt('DS_node_labels.txt', node_labels, fmt='%d')
-
-    if edge_labels:
-        np.savetxt('DS_edge_labels.txt', edge_labels, fmt='%d')
-
-    if node_attributes:
-        np.savetxt('DS_node_attributes.txt', node_attributes, fmt='%s')
-
-    if edge_attributes:
-        np.savetxt('DS_edge_attributes.txt', edge_attributes, fmt='%s')
-
-    if graph_attributes:
-        np.savetxt('DS_graph_attributes.txt', graph_attributes, fmt='%s')
+    # edges = []
+    # graph_indicator = []
+    # graph_labels = []
+    # node_labels = []
+    # edge_labels = []
+    # node_attributes = []
+    # edge_attributes = []
+    # graph_attributes = []
+    #
+    # node_id = 1
+    # for graph_id, graph in enumerate(graphs, start=1):
+    #     # 处理图的标签
+    #     graph_labels.append(graph['label'])
+    #     graph_attributes.append(graph.get('graph_attributes', ''))
+    #
+    #     for node in graph['nodes']:
+    #         # 处理节点的图指示符
+    #         graph_indicator.append(graph_id)
+    #         # 处理节点的标签
+    #         if 'node_labels' in graph:
+    #             node_labels.append(graph['node_labels'][node])
+    #         # 处理节点的属性
+    #         if 'node_attributes' in graph:
+    #             node_attributes.append(','.join(map(str, graph['node_attributes'][node])))
+    #
+    #     for edge, (src, dst) in enumerate(graph['edges']):
+    #         # 处理边
+    #         edges.append((node_id + src, node_id + dst))
+    #         edges.append((node_id + dst, node_id + src))
+    #         # 处理边的标签
+    #         if 'edge_labels' in graph:
+    #             edge_labels.append(graph['edge_labels'][edge])
+    #             edge_labels.append(graph['edge_labels'][edge])
+    #         # 处理边的属性
+    #         if 'edge_attributes' in graph:
+    #             edge_attributes.append(','.join(map(str, graph['edge_attributes'][edge])))
+    #             edge_attributes.append(','.join(map(str, graph['edge_attributes'][edge])))
+    #
+    #     node_id += len(graph['nodes'])
+    #
+    # # 保存文件
+    # np.savetxt('DS_A.txt', edges, fmt='%d')
+    # np.savetxt('DS_graph_indicator.txt', graph_indicator, fmt='%d')
+    # np.savetxt('DS_graph_labels.txt', graph_labels, fmt='%d')
+    #
+    # if node_labels:
+    #     np.savetxt('DS_node_labels.txt', node_labels, fmt='%d')
+    #
+    # if edge_labels:
+    #     np.savetxt('DS_edge_labels.txt', edge_labels, fmt='%d')
+    #
+    # if node_attributes:
+    #     np.savetxt('DS_node_attributes.txt', node_attributes, fmt='%s')
+    #
+    # if edge_attributes:
+    #     np.savetxt('DS_edge_attributes.txt', edge_attributes, fmt='%s')
+    #
+    # if graph_attributes:
+    #     np.savetxt('DS_graph_attributes.txt', graph_attributes, fmt='%s')
 
 
 if __name__ == '__main__':
     dataset_path = "../dataset/vul_kinds_marked/reentrancy-pluto-newmark"
     graphdata_path = "../Source2Graph/graph_data/reentrancy/"
-    files = list_files_in_directory(dataset_path)
+    # files = list_files_in_directory(dataset_path)
     # print("文件列表:", files)
     # source2graph(directory_path, files)
     source2vec(graphdata_path)

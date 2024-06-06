@@ -1,7 +1,7 @@
 import os
 import json
 import numpy as np
-from vec2onehot import vec2onehot
+from Source2Graph.vec2onehot import vec2onehot
 
 """
 S, W, C nips_features: Node nips_features + Edge nips_features + Var nips_features;
@@ -410,12 +410,20 @@ def construct_vec(edge_list, node_embedding, var_embedding, edge_embedding, edge
 
 
 def getVec(filename):
+    # 获取当前脚本文件的目录
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # 构造相对路径基于脚本文件所在目录
     node = "./graph_data/reentrancy/callee_node/" + filename
     edge = "./graph_data/reentrancy/callee_edge/" + filename
-    nodeNum, node_list, node_attribute_list = extract_node_features(node)
+    node_full_path = os.path.join(script_dir, node)
+    edge_full_path = os.path.join(script_dir, edge)
+
+
+    nodeNum, node_list, node_attribute_list = extract_node_features(node_full_path)
     node_attribute_list, extra_var_list = elimination_node(node_attribute_list)
     node_encode, var_encode, node_embedding, var_embedding = embedding_node(node_attribute_list)
-    edge_list, extra_edge_list = elimination_edge(edge)
+    edge_list, extra_edge_list = elimination_edge(edge_full_path)
     edge_encode, edge_embedding = embedding_edge(edge_list)
     node_vec, graph_edge = construct_vec(edge_list, node_embedding, var_embedding, edge_embedding, edge_encode)
     return node_vec, graph_edge
