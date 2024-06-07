@@ -31,36 +31,39 @@ def source2vec(graphdata_path):
     node_path = graphdata_path + "callee_node/"
     edge_path = graphdata_path + "callee_edge/"
 
-    # 构造数据
-    graphs = [
-        {
-            'nodes': [0, 1, 2],
-            'edges': [(0, 1), (1, 2)],
-            'label': 1,
-            'node_labels': [1, 2, 3],
-            'edge_labels': [10, 20],
-            'node_attributes': [[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]],
-            'edge_attributes': [[0.5], [1.5]],
-            'graph_attributes': 1.5
-        },
-        {
-            'nodes': [0, 1],
-            'edges': [(0, 1)],
-            'label': 2,
-            'node_labels': [4, 5],
-            'edge_labels': [30],
-            'node_attributes': [[7.0, 8.0], [9.0, 10.0]],
-            'edge_attributes': [[2.5]],
-            'graph_attributes': 2.5
-        }
-    ]
-
+    # 文件初始化
+    edges = []
+    graph_indicator = []
+    graph_labels = []
+    node_labels = []
+    node_attributes = []
 
     for root, dirs, files in os.walk(node_path):
+        id = 1
+        id_count = 0
         for file in files:
+
             file_path = os.path.join(root, file)
             try:
+                # 生成图的节点和边向量
                 node_vec, graph_edge = Source2Graph.graph2vec.getVec(file)
+
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    lines = f.readlines()
+                    line_count = len(lines)
+                    # 插入图标签
+                    if line_count > 3:
+                        graph_labels.append("1")
+                    else:
+                        graph_labels.append("0")
+                    # 插入 图 indicator
+                    graph_indicator.extend([id]*line_count)
+                    # 插入节点标签
+                    node_labels.extend([1]*line_count)
+                    # 插入节点 attributes 向量
+                    for vec in node_vec:
+                        node_attributes.append(vec[1])
+
                 print(f"node_vec: {node_vec}")
                 print(f"graph_edge: {graph_edge}")
 
@@ -68,15 +71,7 @@ def source2vec(graphdata_path):
                 print(f"转换向量失败 {file_path}：{e}")
 
 
-    # 文件初始化
-    # edges = []
-    # graph_indicator = []
-    # graph_labels = []
-    # node_labels = []
-    # edge_labels = []
-    # node_attributes = []
-    # edge_attributes = []
-    # graph_attributes = []
+
     #
     # node_id = 1
     # for graph_id, graph in enumerate(graphs, start=1):
