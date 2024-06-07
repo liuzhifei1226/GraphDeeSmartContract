@@ -240,7 +240,7 @@ for fold_id in range(n_folds):
         scheduler.step()
         model.train()
         start = time.time()
-        train_loss, n_samples = 0, 0
+        train_loss, n_samples, correct_preds  = 0, 0, 0
         for batch_idx, data in enumerate(train_loader):
             for i in range(len(data)):
                 data[i] = data[i].to(args.device)
@@ -251,13 +251,18 @@ for fold_id in range(n_folds):
             loss.backward()
             optimizer.step()
 
+            # 计算准确率
+            preds = output.argmax(dim=1)  # 假设输出是分类问题，取预测类别
+            correct_preds += (preds == data[4]).sum().item()  # 计算当前批次中正确预测的样本数
+
             time_iter = time.time() - start
             train_loss += loss.item() * len(output)
             n_samples += len(output)
 
-        print('Train Epoch: {} [{}/{} ({:.0f}%)] Loss: {:.6f} (avg: {:.6f})  sec/iter: {:.4f}'.format(
+        accuracy = correct_preds / n_samples  # 计算准确率
+        print('Train Epoch: {} [{}/{} ({:.0f}%)] Loss: {:.6f} (avg: {:.6f}) Accuracy: {:.2f}% sec/iter: {:.4f}'.format(
             epoch + 1, n_samples, len(train_loader.dataset), 100. * (batch_idx + 1) / len(train_loader),
-            loss.item(), train_loss / n_samples, time_iter / (batch_idx + 1)))
+            loss.item(), train_loss / n_samples, accuracy * 100, time_iter / (batch_idx + 1)))
         # torch.save(model, 'Smartcheck.pth')
 
 
