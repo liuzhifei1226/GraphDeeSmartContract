@@ -141,7 +141,7 @@ class DataReader():
         edges = self.parse_txt_file(fpath, line_parse_fn=lambda s: s.split(','))
         adj_dict = {}
         for edge in edges:
-            node1 = int(edge[0].strip()) - 1  # -1 because of zero-indexing in our code
+            node1 = int(edge[0].strip()) - 1
             node2 = int(edge[1].strip()) - 1
             graph_id = nodes[node1]
             assert graph_id == nodes[node2], ('invalid training_data', graph_id, nodes[node2])
