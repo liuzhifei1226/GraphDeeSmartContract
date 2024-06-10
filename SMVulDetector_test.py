@@ -161,6 +161,7 @@ class DataReader():
         unique_id = graph_ids
         for graph_id in graph_ids:
             graphs[graph_id] = np.array(graphs[graph_id])
+        print(f"nodes : {nodes}, graphs: {graphs},  unique_id: {unique_id}")
         return nodes, graphs, unique_id
 
     # 读取节点特征
