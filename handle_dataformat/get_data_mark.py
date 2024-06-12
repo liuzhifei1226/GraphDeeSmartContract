@@ -39,9 +39,10 @@ def slither_mark():
                     destination_file_path, score = process.extractOne(s, path_list)
                     print("destination_file_path:", destination_file_path)
                     source_file_path = "../" + filename
-
+                    # if os.path.exists(destination_file_path):
+                    #     os.remove(destination_file_path)
                     # 复制文件
-                    shutil.copy(source_file_path, destination_file_path)
+                    shutil.copy2(source_file_path, destination_file_path)
 
 # 标记mythril检测的文件并移动到对应的文件夹内
 def mythril_mark():

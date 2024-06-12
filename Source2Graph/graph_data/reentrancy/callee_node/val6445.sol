@@ -1,0 +1,5 @@
+C0 LimitedAC NULL 0 NULL -1
+C1 LimitedAC NULL 0 NULL -1
+C2 LimitedAC NULL 0 NULL -1
+S LimitedAC W0 2 INNADD 0
+W0 LimitedAC C0,C1 1 NULL 0

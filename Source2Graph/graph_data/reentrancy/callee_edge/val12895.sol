@@ -1,0 +1,4 @@
+W0 S W0 1 GN
+W0 S W0 1 FW
+W1 S W1 1 FW
+W1 S W1 1 GN
