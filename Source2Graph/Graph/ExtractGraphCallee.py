@@ -773,10 +773,10 @@ def printResult(file, node_feature, edge_feature):
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
     # 构造相对路径基于脚本文件所在目录
-    # nodeOutPath = "../graph_data/reentrancy/callee_node/" + file
-    # edgeOutPath = "../graph_data/reentrancy/callee_edge/" + file
-    nodeOutPath = "../graph_data/" + file
-    edgeOutPath = "../graph_data/" + file
+    nodeOutPath = "../graph_data/reentrancy/callee_node/" + file
+    edgeOutPath = "../graph_data/reentrancy/callee_edge/" + file
+    # nodeOutPath = "../graph_data/" + file
+    # edgeOutPath = "../graph_data/" + file
     node_full_path = os.path.join(script_dir, nodeOutPath)
     edge_full_path = os.path.join(script_dir, edgeOutPath)
 
