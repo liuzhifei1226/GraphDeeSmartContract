@@ -81,7 +81,6 @@ def source2traindata(graphdata_path):
                 # print(f"graph_edge: {graph_edge}")
 
 
-
             except Exception as e:
                 print(f"转换向量失败 {file_path}：{e}")
             graph_id += 1
