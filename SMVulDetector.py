@@ -184,6 +184,12 @@ class DataReader():
             assert node_features[graph_id][ind[0]] is None, node_features[graph_id][ind[0]]
             node_features[graph_id][ind[0]] = x
         node_features_lst = [node_features[graph_id] for graph_id in sorted(list(graphs.keys()))]
+
+        for graph_id in sorted(list(graphs.keys())):
+            if graph_id not in node_features:
+                print(f"Missing graph_id: {graph_id}")
+            node_features_lst = [node_features[graph_id] for graph_id in sorted(list(graphs.keys()))]
+
         return node_features_lst
 
 
