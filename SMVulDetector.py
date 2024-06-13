@@ -215,9 +215,8 @@ for fold_id in range(n_folds):
     elif args.model == 'graphsage':
         model = GraphSAGE(in_features=loaders[0].dataset.num_features,
                            out_features=loaders[0].dataset.num_classes,
-                           n_hidden=args.n_hidden,
-                           filters=args.filters,
-                           dropout=args.dropout,
+
+                          dropout=args.dropout,
                            ).to(args.device)
     elif args.model == 'gcn_origin':
         model = GCN_ORIGIN(n_feature=loaders[0].dataset.num_features,
