@@ -33,7 +33,7 @@ def source2graph(directory_path, filelist):
 def source2traindata(graphdata_path):
     node_path = graphdata_path + "callee_node/"
     edge_path = graphdata_path + "callee_edge/"
-    training_path = "../training_data/REENTRANCY/"
+    training_path = "../training_data/REENTRANCY_CORENODES_1671/"
     # 文件初始化
     A = []
     graph_indicator = []
@@ -85,7 +85,7 @@ def source2traindata(graphdata_path):
                 print(f"转换向量失败 {file_path}：{e}")
             graph_id += 1
         # 生成并插入图邻接矩阵
-        matric = handle_dataformat.train_data_A.generate_sparse_adjacency_matrix(node_count, 2)
+        matric = handle_dataformat.train_data_A.generate_pairs(1, node_count)
         for i in matric:
             str_list = [str(x) for x in i]
 
