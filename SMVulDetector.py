@@ -13,7 +13,7 @@ from os.path import join as pjoin
 from parser import parameter_parser
 from load_data import split_ids, GraphData, collate_batch
 from models.gcn_modify import GCN_MODIFY
-from models.gcn_origin import GCN_ORIGIN
+from models.gcn_origin_bak import GCN_ORIGIN
 from models.gat import GAT
 from sklearn import metrics
 
@@ -184,16 +184,7 @@ class DataReader():
             assert len(ind) == 1, ind
             assert node_features[graph_id][ind[0]] is None, node_features[graph_id][ind[0]]
             node_features[graph_id][ind[0]] = x
-        first_feature = next(iter(node_features.values()))
-        default_value = np.zeros(first_feature.shape)
-        node_features_lst = []
-        for graph_id in sorted(list(graphs.keys())):
-            if graph_id not in node_features:
-                print(f"Missing graph_id: {graph_id}, using default value.")
-                node_features_lst.append(default_value)
-            else:
-                node_features_lst.append(node_features[graph_id])
-        # node_features_lst = [node_features.get(graph_id, default_value) for graph_id in sorted(list(graphs.keys()))]
+        node_features_lst = [node_features[graph_id] for graph_id in sorted(list(graphs.keys()))]
 
         return node_features_lst
 
