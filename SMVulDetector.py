@@ -129,6 +129,7 @@ class DataReader():
         data['num_features'] = num_features
         data['num_classes'] = num_classes
         self.data = data
+
     #  解析txt文件
     def parse_txt_file(self, fpath, line_parse_fn=None):
         with open(pjoin(self.data_dir, fpath), 'r') as f:
@@ -168,7 +169,7 @@ class DataReader():
         unique_id = graph_ids
         for graph_id in graph_ids:
             graphs[graph_id] = np.array(graphs[graph_id])
-        print(f"nodes:",nodes)
+        print(f"nodes:", nodes)
         return nodes, graphs, unique_id
 
     # 读取节点特征
@@ -183,13 +184,8 @@ class DataReader():
             assert len(ind) == 1, ind
             assert node_features[graph_id][ind[0]] is None, node_features[graph_id][ind[0]]
             node_features[graph_id][ind[0]] = x
-        for graph_id in sorted(list(graphs.keys())):
-            if graph_id not in node_features:
-                print(f"Missing graph_id: {graph_id}")
-            node_features_lst = [node_features[graph_id] for graph_id in sorted(list(graphs.keys()))]
-        node_features_lst = [node_features[graph_id] for graph_id in sorted(list(graphs.keys()))]
-
-
+        default_value = np.zeros(node_features[next(iter(node_features))].shape)
+        node_features_lst = [node_features.get(graph_id, default_value) for graph_id in sorted(list(graphs.keys()))]
 
         return node_features_lst
 
@@ -248,7 +244,7 @@ for fold_id in range(n_folds):
         scheduler.step()
         model.train()
         start = time.time()
-        train_loss, n_samples, correct_preds  = 0, 0, 0
+        train_loss, n_samples, correct_preds = 0, 0, 0
         for batch_idx, data in enumerate(train_loader):
             for i in range(len(data)):
                 data[i] = data[i].to(args.device)
@@ -328,7 +324,6 @@ for fold_id in range(n_folds):
             F1 = metrics.f1_score(data[4], pred.view_as(data[4]))
             FPR = fp / (fp + tn)
             print(tp, fp, tn, fn)
-
 
             print(
                 'Test set (epoch {}): Average loss: {:.4f}, Accuracy: ({:.4f}%), Recall: ({:.4f}%), Precision: ({:.4f}%), '
