@@ -4,21 +4,13 @@ def generate_pairs(start, end):
         edges.append([i, i + 1])
         edges.append([i + 1, i])
     return edges
-# 指定生成数据的范围
-start_number = 1
-end_number = 18  # 这里设置为最终生成的最大数加1
-
-generate_pairs(start_number, end_number)
 
 
-
-
-
-
+#
 # import os
 # from os.path import join as pjoin
 # import numpy as np
-# import Source2Graph.graph2vec
+import Source2Graph.graph2vec
 #
 # """
 # 读取训练数据集的所有txt文件
@@ -85,8 +77,8 @@ generate_pairs(start_number, end_number)
 #         node_features[graph_id][ind[0]] = x
 #     node_features_lst = [node_features[graph_id] for graph_id in sorted(list(graphs.keys()))]
 #     return node_features_lst
-
-
+#
+#
 # data = {}
 # rnd_state = None
 # use_cont_node_attr = False
@@ -106,6 +98,6 @@ generate_pairs(start_number, end_number)
 #                                       nodes, graphs,
 #                                       fn=lambda s: np.array(list(map(float, s.strip().split(',')))))
 
-# node_vec,graph_edge = Source2Graph.graph2vec.getVec("0x0a3fba29c8941fb09f6c712c06d2eade82df225b.sol")
-# print(f"node_vec: {node_vec}")
-# print(f"graph_edge: {graph_edge}")
+node_vec,graph_edge = Source2Graph.graph2vec.getVec("SimpleDAO.sol")
+print(f"node_vec: {node_vec}")
+print(f"graph_edge: {graph_edge}")

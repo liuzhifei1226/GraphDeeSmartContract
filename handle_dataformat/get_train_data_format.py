@@ -42,10 +42,11 @@ def source2traindata(graphdata_path):
     node_labels = []
     node_attributes = []
 
+    matric = []
     for root, dirs, files in os.walk(node_path):
         graph_id = 1
         node_count = 0
-        num = 0
+        num_count = 1
         for file in files:
 
 
@@ -56,8 +57,7 @@ def source2traindata(graphdata_path):
             except Exception as e:
                 print(f"转换向量失败 {file_path}：{e}")
             with open(file_path, 'r', encoding='utf-8') as f:
-                print("num:", num)
-                num += 1
+
                 lines = f.readlines()
 
                 line_count = len(lines)
@@ -77,7 +77,12 @@ def source2traindata(graphdata_path):
                     graph_indicator.append([graph_id])
                     # 插入节点标签
                     node_labels.append([1])
-
+                for i in range(0, line_count-1):
+                    # 生成图邻接矩阵
+                    matric.append([num_count, num_count+1])
+                    matric.append([num_count+1, num_count])
+                    num_count+=1
+                num_count+=1
                 # 插入节点 attributes 向量
                 for vec in node_vec:
                     str_list = [str(x) for x in list(map(float, vec[1]))]
@@ -92,8 +97,8 @@ def source2traindata(graphdata_path):
 
 
             graph_id += 1
-        # 生成并插入图邻接矩阵
-        matric = handle_dataformat.train_data_A.generate_pairs(1, node_count)
+
+
         for i in matric:
             str_list = [str(x) for x in i]
 

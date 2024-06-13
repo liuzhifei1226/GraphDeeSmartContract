@@ -403,6 +403,7 @@ def construct_vec(edge_list, node_embedding, var_embedding, edge_embedding, edge
 
     for i in range(len(edge_encode)):
         graph_edge.append([edge_encode[i][0], edge_encode[i][2][2], edge_encode[i][1]])
+        print(f"edge_encode[i][0]:{edge_encode[i][0]},edge_encode[i][2][2]:{edge_encode[i][2][2]},edge_encode[i][1]:{edge_encode[i][1]}")
 
     print(graph_edge)
 
