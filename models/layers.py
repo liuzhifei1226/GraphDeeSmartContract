@@ -9,6 +9,43 @@ from torch.nn.parameter import Parameter
 args = parameter_parser()
 
 
+class GraphSAGE(nn.Module):
+    def __init__(self, in_features, out_features, activation=None, dropout=0.0, normalize=True):
+        super(GraphSAGE, self).__init__()
+        self.in_features = in_features
+        self.out_features = out_features
+        self.activation = activation
+        self.dropout = nn.Dropout(p=dropout) if dropout > 0 else None
+        self.normalize = normalize
+
+        self.linear = nn.Linear(in_features * 2, out_features)
+
+    def forward(self, x, adj):
+        # x: node features [N, in_features]
+        # adj: adjacency matrix [N, N]
+
+        # Aggregate neighbor features
+        neighbor_features = torch.spmm(adj, x)  # [N, in_features]
+
+        # Concatenate node features with aggregated neighbor features
+        combined = torch.cat([x, neighbor_features], dim=1)  # [N, in_features * 2]
+
+        # Apply dropout if specified
+        if self.dropout:
+            combined = self.dropout(combined)
+
+        # Apply linear transformation
+        out = self.linear(combined)  # [N, out_features]
+
+        # Apply activation function if specified
+        if self.activation:
+            out = self.activation(out)
+
+        # Normalize embeddings if specified
+        if self.normalize:
+            out = F.normalize(out, p=2, dim=1)
+
+        return out
 # GraphConv layers and models
 class GraphConv(nn.Module):
     """

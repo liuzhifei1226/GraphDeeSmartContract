@@ -13,7 +13,8 @@ from os.path import join as pjoin
 from parser import parameter_parser
 from load_data import split_ids, GraphData, collate_batch
 from models.gcn_modify import GCN_MODIFY
-from models.gcn_origin_bak import GCN_ORIGIN
+from models.gcn_origin import GCN_ORIGIN
+from models.graphsage import GraphSAGE
 from models.gat import GAT
 from sklearn import metrics
 
@@ -211,6 +212,13 @@ for fold_id in range(n_folds):
                            dropout=args.dropout,
                            adj_sq=args.adj_sq,
                            scale_identity=args.scale_identity).to(args.device)
+    elif args.model == 'graphsage':
+        model = GraphSAGE(in_features=loaders[0].dataset.num_features,
+                           out_features=loaders[0].dataset.num_classes,
+                           n_hidden=args.n_hidden,
+                           filters=args.filters,
+                           dropout=args.dropout,
+                           ).to(args.device)
     elif args.model == 'gcn_origin':
         model = GCN_ORIGIN(n_feature=loaders[0].dataset.num_features,
                            n_hidden=64,
