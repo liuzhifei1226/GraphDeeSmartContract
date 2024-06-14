@@ -6,7 +6,7 @@ loss_values = []
 accuracy_values = []
 
 # 从文件中读取训练数据
-file_path = "../train_log/GAT_log/result.log"  # 存储训练数据的文件路径
+file_path = "../train_log/GCN_origin_log/result.log"  # 存储训练数据的文件路径
 with open(file_path, 'r') as file:
     for line in file:
         # 使用正则表达式匹配loss和accuracy值
