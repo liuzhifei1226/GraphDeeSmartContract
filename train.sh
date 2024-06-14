@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #for i in $(seq 1 5);
 #do seed=$(( ( RANDOM % 10000 )  + 1 ));
-nohup python3 SMVulDetector.py --dataset REENTRANCY_FULLNODES_1671 --model gat  --epochs 300 --folds 3 > train_log/GCN_modify_log/smartcheck_re.log 2>&1 &
+nohup python3 SMVulDetector.py --dataset REENTRANCY_FULLNODES_1671 --model gcn_modify --dropout 0.08 --vector_dim 100 --lr 0.001 --epochs 200 > train_log/GCN_modify_log/re.log 2>&1 &
 nohup python3 SMVulDetector.py --dataset REENTRANCY_CORENODES_1671 --model graphsage --epochs 200 > train_log/graphsage/2024.6.13.log 2>&1 &
 
 #done
