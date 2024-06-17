@@ -99,11 +99,12 @@ class GraphSAGE(nn.Module):
 class GraphConv(nn.Module):
     def __init__(self, in_features, out_features, n_relations=1, activation=None, adj_sq=False, scale_identity=False):
         super(GraphConv, self).__init__()
-        self.fc = nn.Linear(in_features=in_features * n_relations, out_features=out_features)
+        self.fc = nn.Linear(in_features * n_relations, out_features)
         self.n_relations = n_relations
         self.activation = activation
         self.adj_sq = adj_sq
         self.scale_identity = scale_identity
+        self.bn = nn.BatchNorm1d(out_features)  # 添加批归一化层
 
     def laplacian_batch(self, A):
         batch, N = A.shape[:2]
@@ -132,7 +133,9 @@ class GraphConv(nn.Module):
         x = x * mask
         if self.activation is not None:
             x = self.activation(x)
+        x = self.bn(x)  # 应用批归一化
         return x, A, mask
+
 
 class GraphAttention(nn.Module):
     """
