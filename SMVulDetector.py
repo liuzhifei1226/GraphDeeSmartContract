@@ -214,10 +214,10 @@ for fold_id in range(n_folds):
                            scale_identity=args.scale_identity).to(args.device)
     elif args.model == 'graphsage':
         model = GraphSAGE(in_features=loaders[0].dataset.num_features,
-                           out_features=loaders[0].dataset.num_classes,
+                          out_features=loaders[0].dataset.num_classes,
 
                           dropout=args.dropout,
-                           ).to(args.device)
+                          ).to(args.device)
     elif args.model == 'gcn_origin':
         model = GCN_ORIGIN(n_feature=loaders[0].dataset.num_features,
                            n_hidden=64,
@@ -239,15 +239,17 @@ for fold_id in range(n_folds):
     print('N trainable parameters:', np.sum([p.numel() for p in train_params]))
 
     # 优化器和学习率调度器
-    optimizer = optim.Adam(train_params, lr=args.lr, betas=(0.5, 0.999), weight_decay=args.wd)
-    scheduler = lr_scheduler.MultiStepLR(optimizer, args.lr_decay_steps, gamma=0.1)  # dynamic adjustment lr
+    # optimizer = optim.Adam(train_params, lr=args.lr, betas=(0.5, 0.999), weight_decay=args.wd)
+    # scheduler = lr_scheduler.MultiStepLR(optimizer, args.lr_decay_steps, gamma=0.1)  # dynamic adjustment lr
+    # 定义优化器和学习率调度器
+    optimizer = torch.optim.AdamW(model.parameters(), lr=0.001, weight_decay=5e-4)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5)
     # loss_fn = F.nll_loss  # when model is gcn_origin or gat, use this
     loss_fn = F.cross_entropy  # when model is gcn_modify, use this
 
 
-    # 训练函数
-    def train(train_loader):
-        scheduler.step()
+    # 修改后的训练函数
+    def train(train_loader, model, optimizer, scheduler, loss_fn, args):
         model.train()
         start = time.time()
         train_loss, n_samples, correct_preds = 0, 0, 0
@@ -260,6 +262,7 @@ for fold_id in range(n_folds):
             output = model(data)
             loss = loss_fn(output, data[4])
             loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)  # 梯度裁剪
             optimizer.step()
 
             preds = output.argmax(dim=1)
@@ -272,13 +275,15 @@ for fold_id in range(n_folds):
         accuracy = correct_preds / n_samples
         time_iter = time.time() - start
 
+        scheduler.step(avg_loss)  # 使用损失更新学习率调度器
+
         print(
             f'Train Epoch: {epoch + 1} [{n_samples}/{len(train_loader.dataset)} ({100. * (batch_idx + 1) / len(train_loader):.0f}%)] '
             f'Loss: {loss.item():.6f} (avg: {avg_loss:.6f}) Accuracy: {accuracy * 100:.2f}% sec/iter: {time_iter / (batch_idx + 1):.4f}')
 
 
-    # 测试函数
-    def test(test_loader):
+    # 修改后的测试函数
+    def test(test_loader, model, loss_fn, args):
         model.eval()
         start = time.time()
         test_loss, n_samples = 0, 0
@@ -321,98 +326,98 @@ for fold_id in range(n_folds):
               f'Recall: {recall * 100:.2f}%, Precision: {precision * 100:.2f}%, F1-Score: {F1 * 100:.2f}%, '
               f'FPR: {FPR * 100:.2f}%, sec/iter: {time_iter / (batch_idx + 1):.4f}')
 
-    # 训练函数
-    # def train(train_loader):
-    #     scheduler.step()
-    #     model.train()
-    #     start = time.time()
-    #     train_loss, n_samples, correct_preds = 0, 0, 0
-    #     for batch_idx, data in enumerate(train_loader):
-    #         for i in range(len(data)):
-    #             data[i] = data[i].to(args.device)
-    #         optimizer.zero_grad()
-    #         # output = model(data[0], data[1])  # when model is gcn_origin or gat, use this
-    #         output = model(data)  # when model is gcn_modify, use this
-    #         loss = loss_fn(output, data[4])
-    #         loss.backward()
-    #         optimizer.step()
-    #
-    #         # 计算准确率
-    #         preds = output.argmax(dim=1)  # 假设输出是分类问题，取预测类别
-    #         correct_preds += (preds == data[4]).sum().item()  # 计算当前批次中正确预测的样本数
-    #
-    #         time_iter = time.time() - start
-    #         train_loss += loss.item() * len(output)
-    #         n_samples += len(output)
-    #
-    #     accuracy = correct_preds / n_samples  # 计算准确率
-    #     print('Train Epoch: {} [{}/{} ({:.0f}%)] Loss: {:.6f} (avg: {:.6f}) Accuracy: {:.2f}% sec/iter: {:.4f}'.format(
-    #         epoch + 1, n_samples, len(train_loader.dataset), 100. * (batch_idx + 1) / len(train_loader),
-    #         loss.item(), train_loss / n_samples, accuracy * 100, time_iter / (batch_idx + 1)))
-    #     # torch.save(model, 'Smartcheck.pth')
-    #
-    #
-    # # 测试函数
-    # def test(test_loader):
-    #     model.eval()
-    #     start = time.time()
-    #     test_loss, n_samples, count = 0, 0, 0
-    #     tn, fp, fn, tp = 0, 0, 0, 0  # calculate recall, precision, F1 score
-    #     accuracy, recall, precision, F1 = 0, 0, 0, 0
-    #     fn_list = []  # Store the contract id corresponding to the fn
-    #     fp_list = []  # Store the contract id corresponding to the fp
-    #
-    #     for batch_idx, data in enumerate(test_loader):
-    #         for i in range(len(data)):
-    #             data[i] = data[i].to(args.device)
-    #         # output = model(data[0], data[1])  # when model is gcn_origin or gat, use this
-    #         output = model(data)  # when model is gcn_modify, use this
-    #         loss = loss_fn(output, data[4], reduction='sum')
-    #         test_loss += loss.item()
-    #         n_samples += len(output)
-    #         count += 1
-    #         pred = output.detach().cpu().max(1, keepdim=True)[1]
-    #
-    #         for k in range(len(pred)):
-    #             if (np.array(pred.view_as(data[4])[k]).tolist() == 1) & (
-    #                     np.array(data[4].detach().cpu()[k]).tolist() == 1):
-    #                 # TP predict == 1 & label == 1
-    #                 tp += 1
-    #                 continue
-    #             elif (np.array(pred.view_as(data[4])[k]).tolist() == 0) & (
-    #                     np.array(data[4].detach().cpu()[k]).tolist() == 0):
-    #                 # TN predict == 0 & label == 0
-    #                 tn += 1
-    #                 continue
-    #             elif (np.array(pred.view_as(data[4])[k]).tolist() == 0) & (
-    #                     np.array(data[4].detach().cpu()[k]).tolist() == 1):
-    #                 # FN predict == 0 & label == 1
-    #                 fn += 1
-    #                 fn_list.append(np.array(data[5].detach().cpu()[k]).tolist())
-    #                 continue
-    #             elif (np.array(pred.view_as(data[4])[k]).tolist() == 1) & (
-    #                     np.array(data[4].detach().cpu()[k]).tolist() == 0):
-    #                 # FP predict == 1 & label == 0
-    #                 fp += 1
-    #                 fp_list.append(np.array(data[5].detach().cpu()[k]).tolist())
-    #                 continue
-    #         # accuracy += metrics.accuracy_score(data[4], pred.view_as(data[4]))
-    #         # recall += metrics.recall_score(data[4], pred.view_as(data[4]))
-    #         # precision += metrics.precision_score(data[4], pred.view_as(data[4]))
-    #         # F1 += metrics.f1_score(data[4], pred.view_as(data[4]))
-    #         accuracy = metrics.accuracy_score(data[4], pred.view_as(data[4]))
-    #         recall = metrics.recall_score(data[4], pred.view_as(data[4]))
-    #         precision = metrics.precision_score(data[4], pred.view_as(data[4]))
-    #         F1 = metrics.f1_score(data[4], pred.view_as(data[4]))
-    #         FPR = fp / (fp + tn)
-    #         print(tp, fp, tn, fn)
-    #
-    #         print(
-    #             'Test set (epoch {}): Average loss: {:.4f}, Accuracy: ({:.4f}%), Recall: ({:.4f}%), Precision: ({:.4f}%), '
-    #             'F1-Score: ({:.4f}%), FPR: ({:.2f}%)  sec/iter: {:.4f}\n'.format(
-    #                 epoch + 1, test_loss / n_samples, accuracy, recall, precision, F1, FPR,
-    #                 (time.time() - start) / len(test_loader))
-    #         )
+        # 训练函数
+        # def train(train_loader):
+        #     scheduler.step()
+        #     model.train()
+        #     start = time.time()
+        #     train_loss, n_samples, correct_preds = 0, 0, 0
+        #     for batch_idx, data in enumerate(train_loader):
+        #         for i in range(len(data)):
+        #             data[i] = data[i].to(args.device)
+        #         optimizer.zero_grad()
+        #         # output = model(data[0], data[1])  # when model is gcn_origin or gat, use this
+        #         output = model(data)  # when model is gcn_modify, use this
+        #         loss = loss_fn(output, data[4])
+        #         loss.backward()
+        #         optimizer.step()
+        #
+        #         # 计算准确率
+        #         preds = output.argmax(dim=1)  # 假设输出是分类问题，取预测类别
+        #         correct_preds += (preds == data[4]).sum().item()  # 计算当前批次中正确预测的样本数
+        #
+        #         time_iter = time.time() - start
+        #         train_loss += loss.item() * len(output)
+        #         n_samples += len(output)
+        #
+        #     accuracy = correct_preds / n_samples  # 计算准确率
+        #     print('Train Epoch: {} [{}/{} ({:.0f}%)] Loss: {:.6f} (avg: {:.6f}) Accuracy: {:.2f}% sec/iter: {:.4f}'.format(
+        #         epoch + 1, n_samples, len(train_loader.dataset), 100. * (batch_idx + 1) / len(train_loader),
+        #         loss.item(), train_loss / n_samples, accuracy * 100, time_iter / (batch_idx + 1)))
+        #     # torch.save(model, 'Smartcheck.pth')
+        #
+        #
+        # # 测试函数
+        # def test(test_loader):
+        #     model.eval()
+        #     start = time.time()
+        #     test_loss, n_samples, count = 0, 0, 0
+        #     tn, fp, fn, tp = 0, 0, 0, 0  # calculate recall, precision, F1 score
+        #     accuracy, recall, precision, F1 = 0, 0, 0, 0
+        #     fn_list = []  # Store the contract id corresponding to the fn
+        #     fp_list = []  # Store the contract id corresponding to the fp
+        #
+        #     for batch_idx, data in enumerate(test_loader):
+        #         for i in range(len(data)):
+        #             data[i] = data[i].to(args.device)
+        #         # output = model(data[0], data[1])  # when model is gcn_origin or gat, use this
+        #         output = model(data)  # when model is gcn_modify, use this
+        #         loss = loss_fn(output, data[4], reduction='sum')
+        #         test_loss += loss.item()
+        #         n_samples += len(output)
+        #         count += 1
+        #         pred = output.detach().cpu().max(1, keepdim=True)[1]
+        #
+        #         for k in range(len(pred)):
+        #             if (np.array(pred.view_as(data[4])[k]).tolist() == 1) & (
+        #                     np.array(data[4].detach().cpu()[k]).tolist() == 1):
+        #                 # TP predict == 1 & label == 1
+        #                 tp += 1
+        #                 continue
+        #             elif (np.array(pred.view_as(data[4])[k]).tolist() == 0) & (
+        #                     np.array(data[4].detach().cpu()[k]).tolist() == 0):
+        #                 # TN predict == 0 & label == 0
+        #                 tn += 1
+        #                 continue
+        #             elif (np.array(pred.view_as(data[4])[k]).tolist() == 0) & (
+        #                     np.array(data[4].detach().cpu()[k]).tolist() == 1):
+        #                 # FN predict == 0 & label == 1
+        #                 fn += 1
+        #                 fn_list.append(np.array(data[5].detach().cpu()[k]).tolist())
+        #                 continue
+        #             elif (np.array(pred.view_as(data[4])[k]).tolist() == 1) & (
+        #                     np.array(data[4].detach().cpu()[k]).tolist() == 0):
+        #                 # FP predict == 1 & label == 0
+        #                 fp += 1
+        #                 fp_list.append(np.array(data[5].detach().cpu()[k]).tolist())
+        #                 continue
+        #         # accuracy += metrics.accuracy_score(data[4], pred.view_as(data[4]))
+        #         # recall += metrics.recall_score(data[4], pred.view_as(data[4]))
+        #         # precision += metrics.precision_score(data[4], pred.view_as(data[4]))
+        #         # F1 += metrics.f1_score(data[4], pred.view_as(data[4]))
+        #         accuracy = metrics.accuracy_score(data[4], pred.view_as(data[4]))
+        #         recall = metrics.recall_score(data[4], pred.view_as(data[4]))
+        #         precision = metrics.precision_score(data[4], pred.view_as(data[4]))
+        #         F1 = metrics.f1_score(data[4], pred.view_as(data[4]))
+        #         FPR = fp / (fp + tn)
+        #         print(tp, fp, tn, fn)
+        #
+        #         print(
+        #             'Test set (epoch {}): Average loss: {:.4f}, Accuracy: ({:.4f}%), Recall: ({:.4f}%), Precision: ({:.4f}%), '
+        #             'F1-Score: ({:.4f}%), FPR: ({:.2f}%)  sec/iter: {:.4f}\n'.format(
+        #                 epoch + 1, test_loss / n_samples, accuracy, recall, precision, F1, FPR,
+        #                 (time.time() - start) / len(test_loader))
+        #         )
 
         # print(tp, fp, tn, fn)
         # accuracy = 100. * accuracy / count
@@ -462,4 +467,3 @@ print(
         np.mean(precision_list), np.std(precision_list), np.mean(F1_list), np.std(F1_list), np.mean(FPR_list),
         np.std(FPR_list))
 )
-
