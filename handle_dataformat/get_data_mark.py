@@ -1,4 +1,4 @@
-# nohup ./smartbugs -t slither -f dataset/xfuzz_contracts_unmark/*.sol --processes 2 --mem-limit 2g --timeout 600 > output.txt 2>&1 &
+# nohup ./smartbugs -t mythril -f dataset/xfuzz_contracts_unmark/*.sol --processes 2 --mem-limit 2g --timeout 300 > output.txt 2>&1 &
 from enum import Enum
 import csv
 import shutil

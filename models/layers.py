@@ -47,14 +47,57 @@ class GraphSAGE(nn.Module):
 
         return out
 # GraphConv layers and models
-class GraphConv(nn.Module):
-    """
-    Graph Convolution Layer & Additional tricks (power of adjacency matrix and weighted self connections)
-    n_relations: number of relation types (adjacency matrices)
-    """
+# class GraphConv(nn.Module):
+#     """
+#     Graph Convolution Layer & Additional tricks (power of adjacency matrix and weighted self connections)
+#     n_relations: number of relation types (adjacency matrices)
+#     """
+#
+#     def __init__(self, in_features, out_features, n_relations=1,
+#                  activation=None, adj_sq=False, scale_identity=False):
+#         super(GraphConv, self).__init__()
+#         self.fc = nn.Linear(in_features=in_features * n_relations, out_features=out_features)
+#         self.n_relations = n_relations
+#         self.activation = activation
+#         self.adj_sq = adj_sq
+#         self.scale_identity = scale_identity
+#
+#     def laplacian_batch(self, A):
+#         batch, N = A.shape[:2]
+#         if self.adj_sq:
+#             A = torch.bmm(A, A)  # use A^2 to increase graph connectivity
+#         I = torch.eye(N).unsqueeze(0).to(args.device)
+#         a = I.shape
+#         if self.scale_identity:
+#             I = 2 * I  # increase weight of self connections
+#         # A_hat = A
+#         # add I represents self connections of nodes
+#         A_hat = I + A
+#         # D_hat = (torch.sum(A_hat, 1) + 1e-5) ** (-0.5)  # Adjacent matrix normalization
+#         # L = D_hat.view(batch, N, 1) * A_hat * D_hat.view(batch, 1, N)
+#         L = A_hat  # remove D_hat
+#         return L
+#
+#     def forward(self, data):
+#         x, A, mask = data[:3]
+#         if len(A.shape) == 3:
+#             A = A.unsqueeze(3)
+#         x_hat = []
+#         for rel in range(self.n_relations):
+#             x_hat.append(torch.bmm(self.laplacian_batch(A[:, :, :, rel]), x))
+#         x = self.fc(torch.cat(x_hat, 2))
+#
+#         if len(mask.shape) == 2:
+#             mask = mask.unsqueeze(2)
+#         x = x * mask
+#         # to make values of dummy nodes zeros again, otherwise the bias is added after applying self.fc
+#         # which affects callee_node embeddings in the following layers
+#         if self.activation is not None:
+#             x = self.activation(x)
+#         return x, A, mask
 
-    def __init__(self, in_features, out_features, n_relations=1,
-                 activation=None, adj_sq=False, scale_identity=False):
+class GraphConv(nn.Module):
+    def __init__(self, in_features, out_features, n_relations=1, activation=None, adj_sq=False, scale_identity=False):
         super(GraphConv, self).__init__()
         self.fc = nn.Linear(in_features=in_features * n_relations, out_features=out_features)
         self.n_relations = n_relations
@@ -66,16 +109,13 @@ class GraphConv(nn.Module):
         batch, N = A.shape[:2]
         if self.adj_sq:
             A = torch.bmm(A, A)  # use A^2 to increase graph connectivity
-        I = torch.eye(N).unsqueeze(0).to(args.device)
-        a = I.shape
+        I = torch.eye(N).unsqueeze(0).to(A.device)
         if self.scale_identity:
             I = 2 * I  # increase weight of self connections
-        # A_hat = A
-        # add I represents self connections of nodes
         A_hat = I + A
-        # D_hat = (torch.sum(A_hat, 1) + 1e-5) ** (-0.5)  # Adjacent matrix normalization
-        # L = D_hat.view(batch, N, 1) * A_hat * D_hat.view(batch, 1, N)
-        L = A_hat  # remove D_hat
+        D_hat = torch.sum(A_hat, 1) ** (-0.5)
+        D_hat = torch.diag_embed(D_hat)
+        L = torch.bmm(torch.bmm(D_hat, A_hat), D_hat)
         return L
 
     def forward(self, data):
@@ -90,12 +130,9 @@ class GraphConv(nn.Module):
         if len(mask.shape) == 2:
             mask = mask.unsqueeze(2)
         x = x * mask
-        # to make values of dummy nodes zeros again, otherwise the bias is added after applying self.fc
-        # which affects callee_node embeddings in the following layers
         if self.activation is not None:
             x = self.activation(x)
         return x, A, mask
-
 
 class GraphAttention(nn.Module):
     """
