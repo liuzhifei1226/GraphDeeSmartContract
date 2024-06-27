@@ -7,7 +7,11 @@ from torch.utils.data import DataLoader
 from load_data import split_ids, GraphData, collate_batch
 import torch.optim as optim
 
-
+print("111111111111111111111111111111111111111111")
+seed = 50
+rnd_state = np.random.RandomState(seed)
+datareader = DataReader(data_dir='./training_data/LOOP_FULLNODES_1317/', rnd_state=rnd_state,
+                        use_cont_node_attr=False, folds=1)
 loaders = []
 for split in ['train', 'test']:
     gdata = GraphData(fold_id=1, datareader=datareader, split=1)
@@ -27,18 +31,13 @@ model.load_state_dict(torch.load('FFG.pth'))
 # 定义损失函数和优化器
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=5e-4)
-seed = 50
-rnd_state = np.random.RandomState(seed)
-datareader = DataReader(data_dir='./training_data/LOOP_FULLNODES_1317/', rnd_state=rnd_state,
-                        use_cont_node_attr=False, folds=1)
 
-
-
-
+print("222222222222222222222222222222222222222222222")
 # 冻结图卷积层的参数
 for param in GCN_MODIFY.gconv.parameters():
     param.requires_grad = False
 
+print("startstartstartstartstartstartstartstartstart")
 # 训练循环
 num_epochs = 200
 for epoch in range(num_epochs):
