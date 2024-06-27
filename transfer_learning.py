@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import torch.nn as nn
-from SMVulDetector import DataReader
+from SMVulDetector_main import DataReader
 from models.gcn_modify import GCN_MODIFY
 from torch.utils.data import DataLoader
 from load_data import split_ids, GraphData, collate_batch
