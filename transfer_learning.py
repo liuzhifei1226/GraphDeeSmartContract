@@ -36,7 +36,7 @@ model = GCN_MODIFY(in_features=loaders[0].dataset.num_features,
                        filters='64,64,64',
                        dropout=0.3,
                        adj_sq=True,
-                       scale_identity='store_true').to('cpu')
+                       scale_identity=True).to('cpu')
 model.load_state_dict(torch.load('FFG.pth'))
 
 # 定义损失函数和优化器
