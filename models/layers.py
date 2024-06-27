@@ -131,9 +131,15 @@ class GraphConv(nn.Module):
         if len(mask.shape) == 2:
             mask = mask.unsqueeze(2)
         x = x * mask
+
         if self.activation is not None:
             x = self.activation(x)
-        x = self.bn(x)  # 应用批归一化
+
+        # 调整形状以适应批归一化层
+        batch_size, num_nodes, num_features = x.shape
+        x = x.view(batch_size * num_nodes, num_features)  # (batch_size * num_nodes, out_features)
+        x = self.bn(x)
+        x = x.view(batch_size, num_nodes, num_features)  # 恢复原来的形状
         return x, A, mask
 
 
