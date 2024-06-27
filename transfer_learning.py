@@ -13,12 +13,6 @@ seed = 50
 rnd_state = np.random.RandomState(seed)
 datareader = DataReader(data_dir='./training_data/LOOP_FULLNODES_1317/', rnd_state=rnd_state,
                         use_cont_node_attr=False, folds=1)
-loaders = []
-for split in ['train', 'test']:
-    gdata = GraphData(fold_id=1, datareader=datareader, split=1)
-    loader = DataLoader(gdata, batch_size=128, shuffle=split.find('train') >= 0,
-                            num_workers=2, collate_fn=collate_batch)
-    loaders.append(loader)
 
 for fold_id in range(3):
     loaders = []
