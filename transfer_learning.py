@@ -20,13 +20,21 @@ for split in ['train', 'test']:
                             num_workers=2, collate_fn=collate_batch)
     loaders.append(loader)
 
+for fold_id in range(3):
+    loaders = []
+    for split in ['train', 'test']:
+        gdata = GraphData(fold_id=fold_id, datareader=datareader, split=split)
+        loader = DataLoader(gdata, batch_size=128, shuffle=split.find('train') >= 0,
+                            num_workers=2, collate_fn=collate_batch)
+        loaders.append(loader)
+
 model = GCN_MODIFY(in_features=loaders[0].dataset.num_features,
-                           out_features=loaders[0].dataset.num_classes,
-                           n_hidden=256,
-                           filters='64,64,64',
-                           dropout=0.3,
-                           adj_sq=True,
-                           scale_identity='store_true').to('cpu')
+                       out_features=loaders[0].dataset.num_classes,
+                       n_hidden=256,
+                       filters='64,64,64',
+                       dropout=0.3,
+                       adj_sq=True,
+                       scale_identity='store_true').to('cpu')
 model.load_state_dict(torch.load('FFG.pth'))
 
 # 定义损失函数和优化器
