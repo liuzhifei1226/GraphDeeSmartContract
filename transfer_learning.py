@@ -13,7 +13,7 @@ seed = 50
 rnd_state = np.random.RandomState(seed)
 datareader = DataReader(data_dir='./training_data/LOOP_FULLNODES_1317/', rnd_state=rnd_state,
                         use_cont_node_attr=False, folds=1)
-print("Number of graphs in datareader:", len(datareader.data))
+print("Number of graphs in datareader:", datareader.N_graphs)
 
 for fold_id in range(3):
     loaders = []

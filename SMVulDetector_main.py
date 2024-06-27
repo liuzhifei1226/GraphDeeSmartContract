@@ -113,6 +113,7 @@ class DataReader():
             print('feature {}, count {}/{}'.format(u, np.count_nonzero(features_all == u), len(features_all)))
 
         N_graphs = len(labels)  # training_data中的样本（图）数
+        self.N_graphs = N_graphs
         assert N_graphs == len(data['adj_list']) == len(features_onehot), 'invalid training_data'
 
         # 先创建测试集
