@@ -6,29 +6,39 @@ from models.gcn_modify import GCN_MODIFY
 from torch.utils.data import DataLoader
 from load_data import split_ids, GraphData, collate_batch
 import torch.optim as optim
-print("Running script:", __file__)
 
+print("Running script:", __file__)
 print("111111111111111111111111111111111111111111")
+
 seed = 50
 rnd_state = np.random.RandomState(seed)
 datareader = DataReader(data_dir='./training_data/LOOP_FULLNODES_1317/', rnd_state=rnd_state,
                         use_cont_node_attr=False, folds=1)
 
+# Check datareader
+print("Number of graphs in datareader:", len(datareader.graphs))
+
 for fold_id in range(3):
     loaders = []
     for split in ['train', 'test']:
         gdata = GraphData(fold_id=fold_id, datareader=datareader, split=split)
+        print(f"Fold {fold_id} Split {split} - Number of samples in dataset: {len(gdata)}")
+
         loader = DataLoader(gdata, batch_size=128, shuffle=split.find('train') >= 0,
                             num_workers=2, collate_fn=collate_batch)
         loaders.append(loader)
 
+    # Check number of batches
+    for i, loader in enumerate(loaders):
+        print(f"Fold {fold_id} Loader {i} - Number of batches: {len(loader)}")
+
 model = GCN_MODIFY(in_features=loaders[0].dataset.num_features,
-                       out_features=loaders[0].dataset.num_classes,
-                       n_hidden=256,
-                       filters='64,64,64',
-                       dropout=0.3,
-                       adj_sq=True,
-                       scale_identity='store_true').to('cpu')
+                   out_features=loaders[0].dataset.num_classes,
+                   n_hidden=256,
+                   filters='64,64,64',
+                   dropout=0.3,
+                   adj_sq=True,
+                   scale_identity='store_true').to('cpu')
 model.load_state_dict(torch.load('FFG.pth'))
 
 # 定义损失函数和优化器
@@ -37,31 +47,31 @@ optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=5e-4)
 
 print("222222222222222222222222222222222222222222222")
 # 冻结图卷积层的参数
-for param in GCN_MODIFY.gconv.parameters():
+for param in model.gconv.parameters():
     param.requires_grad = False
 
 print("startstartstartstartstartstartstartstartstart")
 # 训练循环
 num_epochs = 200
 for epoch in range(num_epochs):
-    GCN_MODIFY.train()
+    model.train()
     for data in loaders[0]:
         inputs, labels = data
         optimizer.zero_grad()
-        outputs = GCN_MODIFY(inputs)
+        outputs = model(inputs)
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
 
     print(f'Epoch {epoch+1}/{num_epochs}, Loss: {loss.item()}')
 
-GCN_MODIFY.eval()
+model.eval()
 correct = 0
 total = 0
 with torch.no_grad():
     for data in loaders[1]:
         inputs, labels = data
-        outputs = GCN_MODIFY(inputs)
+        outputs = model(inputs)
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
