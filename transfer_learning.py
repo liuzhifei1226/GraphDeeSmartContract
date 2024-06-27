@@ -28,6 +28,8 @@ for fold_id in range(3):
     for i, loader in enumerate(loaders):
         print(f"Fold {fold_id} Loader {i} - Number of batches: {len(loader)}")
 
+print(f"Number of features: {loaders[0].dataset.num_features}")
+print(f"Number of classes: {loaders[0].dataset.num_classes}")
 model = GCN_MODIFY(in_features=loaders[0].dataset.num_features,
                        out_features=loaders[0].dataset.num_classes,
                        n_hidden=256,
