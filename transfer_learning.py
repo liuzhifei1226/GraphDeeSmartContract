@@ -4,19 +4,8 @@ import torch.nn as nn
 from SMVulDetector import DataReader
 from models.gcn_modify import GCN_MODIFY
 from torch.utils.data import DataLoader
-from load_data import GraphData
 from load_data import split_ids, GraphData, collate_batch
-
-
 import torch.optim as optim
-
-# 定义损失函数和优化器
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(filter(lambda p: p.requires_grad, GCN_MODIFY.parameters()), lr=0.001)
-seed = 50
-rnd_state = np.random.RandomState(seed)
-datareader = DataReader(data_dir='./training_data/LOOP_FULLNODES_1317/', rnd_state=rnd_state,
-                        use_cont_node_attr=False, folds=1)
 
 
 loaders = []
@@ -26,15 +15,25 @@ for split in ['train', 'test']:
                             num_workers=2, collate_fn=collate_batch)
     loaders.append(loader)
 
-
-GCN_MODIFY(in_features=loaders[0].dataset.num_features,
+model = GCN_MODIFY(in_features=loaders[0].dataset.num_features,
                            out_features=loaders[0].dataset.num_classes,
                            n_hidden=256,
                            filters='64,64,64',
                            dropout=0.3,
                            adj_sq=True,
                            scale_identity='store_true').to('cpu')
-GCN_MODIFY.load_state_dict(torch.load('FFG.pth'))
+model.load_state_dict(torch.load('FFG.pth'))
+
+# 定义损失函数和优化器
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=5e-4)
+seed = 50
+rnd_state = np.random.RandomState(seed)
+datareader = DataReader(data_dir='./training_data/LOOP_FULLNODES_1317/', rnd_state=rnd_state,
+                        use_cont_node_attr=False, folds=1)
+
+
+
 
 # 冻结图卷积层的参数
 for param in GCN_MODIFY.gconv.parameters():
@@ -44,7 +43,7 @@ for param in GCN_MODIFY.gconv.parameters():
 num_epochs = 200
 for epoch in range(num_epochs):
     GCN_MODIFY.train()
-    for data in loader:
+    for data in loaders[0]:
         inputs, labels = data
         optimizer.zero_grad()
         outputs = GCN_MODIFY(inputs)
