@@ -19,6 +19,7 @@ for fold_id in range(3):
     loaders = []
     for split in ['train', 'test']:
         gdata = GraphData(fold_id=fold_id, datareader=datareader, split=split)
+        print(f"gdata:{gdata.__len__()}")
         print(f"Number of samples in dataset: {len(gdata)}")
         loader = DataLoader(gdata, batch_size=128, shuffle=split.find('train') >= 0,
                             num_workers=2, collate_fn=collate_batch)
