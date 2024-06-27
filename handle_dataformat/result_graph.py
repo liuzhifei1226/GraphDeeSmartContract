@@ -10,7 +10,7 @@ file_path = "../train_log/GCN_modify_log/result.log"  # 存储训练数据的文
 with open(file_path, 'r') as file:
     for line in file:
         # 使用正则表达式匹配loss和accuracy值
-        match = re.search(r'Loss: (\d+\.\d+)', line)
+        match = re.search(r'avg: (\d+\.\d+)', line)
         if match:
             loss_values.append(float(match.group(1))*100)
         match = re.search(r'Accuracy: (\d+\.\d+)%', line)

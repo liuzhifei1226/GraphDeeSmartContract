@@ -243,7 +243,7 @@ for fold_id in range(n_folds):
     # scheduler = lr_scheduler.MultiStepLR(optimizer, args.lr_decay_steps, gamma=0.1)  # dynamic adjustment lr
     # 定义优化器和学习率调度器
     optimizer = torch.optim.AdamW(model.parameters(), lr=0.001, weight_decay=5e-4)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=10,verbose=True)
     # loss_fn = F.nll_loss  # when model is gcn_origin or gat, use this
     loss_fn = F.cross_entropy  # when model is gcn_modify, use this
 
@@ -275,8 +275,8 @@ for fold_id in range(n_folds):
         accuracy = correct_preds / n_samples
         time_iter = time.time() - start
 
-        scheduler.step(avg_loss)  # 使用损失更新学习率调度器
-
+        scheduler.step(train_loss) # 使用损失更新学习率调度器
+        torch.save(model, 'FFG.pth')
         print(
             f'Train Epoch: {epoch + 1} [{n_samples}/{len(train_loader.dataset)} ({100. * (batch_idx + 1) / len(train_loader):.0f}%)] '
             f'Loss: {loss.item():.6f} (avg: {avg_loss:.6f}) Accuracy: {accuracy * 100:.2f}% sec/iter: {time_iter / (batch_idx + 1):.4f}')
@@ -443,6 +443,7 @@ for fold_id in range(n_folds):
     # 进行多个epoch的训练和测试
     for epoch in range(args.epochs):
         train(loaders[0])
+
     accuracy, recall, precision, F1, FPR = test(loaders[1])
     result_folds.append([accuracy, recall, precision, F1, FPR])
 
