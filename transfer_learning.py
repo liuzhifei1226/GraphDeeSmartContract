@@ -6,6 +6,7 @@ from models.gcn_modify import GCN_MODIFY
 from torch.utils.data import DataLoader
 from load_data import split_ids, GraphData, collate_batch
 import torch.optim as optim
+print("Running script:", __file__)
 
 print("111111111111111111111111111111111111111111")
 seed = 50
