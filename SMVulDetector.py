@@ -249,7 +249,7 @@ for fold_id in range(n_folds):
 
 
     # 修改后的训练函数
-    def train(train_loader, model, optimizer, scheduler, loss_fn, args):
+    def train(train_loader):
         model.train()
         start = time.time()
         train_loss, n_samples, correct_preds = 0, 0, 0
@@ -283,7 +283,7 @@ for fold_id in range(n_folds):
 
 
     # 修改后的测试函数
-    def test(test_loader, model, loss_fn, args):
+    def test(test_loader):
         model.eval()
         start = time.time()
         test_loss, n_samples = 0, 0
