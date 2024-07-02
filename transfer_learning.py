@@ -28,14 +28,16 @@ for fold_id in range(3):
     for i, loader in enumerate(loaders):
         print(f"Fold {fold_id} Loader {i} - Number of batches: {len(loader)}")
 
-print(f"Number of features: {loaders[0].dataset.num_features}")
-print(f"Number of classes: {loaders[0].dataset.num_classes}")
+print(f"Number of features: {loaders[0].dataset.num_features}",type(loaders[0].dataset.num_features))
+print(f"Number of classes: {loaders[0].dataset.num_classes}",type(loaders[0].dataset.num_classes))
+
+
 model = GCN_MODIFY(in_features=loaders[0].dataset.num_features,
                        out_features=loaders[0].dataset.num_classes,
                        n_hidden=256,
                        filters='64,64,64',
                        dropout=0.3,
-                       adj_sq=True,
+                       adj_sq=False,
                        scale_identity=False).to('cpu')
 model.load_state_dict(torch.load('FFG.pth'))
 
