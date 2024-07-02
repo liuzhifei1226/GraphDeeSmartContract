@@ -53,8 +53,8 @@ optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=5e-4)
 
 print("222222222222222222222222222222222222222222222")
 # 冻结图卷积层的参数
-for param in GCN_MODIFY.gconv.parameters():
-    param.requires_grad = False
+# for param in GCN_MODIFY.gconv.parameters():
+#     param.requires_grad = False
 
 print("startstartstartstartstartstartstartstartstart")
 # 训练循环
