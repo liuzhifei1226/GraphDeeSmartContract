@@ -104,7 +104,7 @@ class GraphConv(nn.Module):
         self.activation = activation
         self.adj_sq = adj_sq
         self.scale_identity = scale_identity
-        self.bn = nn.BatchNorm1d(out_features)  # 添加批归一化层
+        self.bn = nn.BatchNorm1d(int(out_features))  # 添加批归一化层
 
     def laplacian_batch(self, A):
         batch, N = A.shape[:2]
