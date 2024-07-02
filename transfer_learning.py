@@ -62,9 +62,10 @@ num_epochs = 200
 for epoch in range(num_epochs):
     model.train()
     for data in loaders[0]:
+        print(data)
         inputs, labels = data
         optimizer.zero_grad()
-        outputs = GCN_MODIFY(inputs)
+        outputs = model(inputs)
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
@@ -76,8 +77,9 @@ correct = 0
 total = 0
 with torch.no_grad():
     for data in loaders[1]:
+        print(data)
         inputs, labels = data
-        outputs = GCN_MODIFY(inputs)
+        outputs = model(inputs)
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
