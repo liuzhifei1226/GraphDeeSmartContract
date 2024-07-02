@@ -47,6 +47,7 @@ for key, value in state_dict.items():
     print(key, value.shape)
 for name, param in model.named_parameters():
     print(name, param.shape)
+
 # 定义损失函数和优化器
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=5e-4)
