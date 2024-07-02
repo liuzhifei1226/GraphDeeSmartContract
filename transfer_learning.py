@@ -41,7 +41,7 @@ model = GCN_MODIFY(in_features=loaders[0].dataset.num_features,
                        scale_identity=False).to('cpu')
 ckpt = torch.load('FFG.pth')
 ckpt.pop('gconv.0.fc.weight')
-msg = model.load_state_dict(ckpt)
+msg = model.load_state_dict(ckpt,strict=False)
 print(msg)
 
 
