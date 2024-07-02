@@ -60,7 +60,7 @@ print("startstartstartstartstartstartstartstartstart")
 # 训练循环
 num_epochs = 200
 for epoch in range(num_epochs):
-    GCN_MODIFY.train()
+    model.train()
     for data in loaders[0]:
         inputs, labels = data
         optimizer.zero_grad()
@@ -71,7 +71,7 @@ for epoch in range(num_epochs):
 
     print(f'Epoch {epoch+1}/{num_epochs}, Loss: {loss.item()}')
 
-GCN_MODIFY.eval()
+model.eval()
 correct = 0
 total = 0
 with torch.no_grad():
