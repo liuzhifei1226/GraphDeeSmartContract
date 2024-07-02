@@ -39,14 +39,12 @@ model = GCN_MODIFY(in_features=loaders[0].dataset.num_features,
                        dropout=0.3,
                        adj_sq=False,
                        scale_identity=False).to('cpu')
-model.load_state_dict(torch.load('FFG.pth'), strict=False)
+ckpt = torch.load('FFG.pth')
+msg = model.load_state_dict(ckpt)
+print(msg)
 
-state_dict = torch.load('FFG.pth')
-print(type(state_dict))  # 应该输出 <class 'collections.OrderedDict'>
-for key, value in state_dict.items():
-    print(key, value.shape)
-for name, param in model.named_parameters():
-    print(name, param.shape)
+
+
 
 # 定义损失函数和优化器
 criterion = nn.CrossEntropyLoss()
