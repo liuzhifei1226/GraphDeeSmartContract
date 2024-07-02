@@ -279,7 +279,7 @@ for fold_id in range(n_folds):
         time_iter = time.time() - start
 
         scheduler.step(train_loss) # 使用损失更新学习率调度器
-        torch.save(model, 'FFG.pth')
+        torch.save(model.state_dict(), 'FFG.pth')
         print(
             f'Train Epoch: {epoch + 1} [{n_samples}/{len(train_loader.dataset)} ({100. * (batch_idx + 1) / len(train_loader):.0f}%)] '
             f'Loss: {loss.item():.6f} (avg: {avg_loss:.6f}) Accuracy: {accuracy * 100:.2f}% sec/iter: {time_iter / (batch_idx + 1):.4f}')
