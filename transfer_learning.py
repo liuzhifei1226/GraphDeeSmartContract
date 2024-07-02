@@ -35,7 +35,7 @@ print(f"Number of classes: {loaders[0].dataset.num_classes}",type(loaders[0].dat
 model = GCN_MODIFY(in_features=loaders[0].dataset.num_features,
                        out_features=loaders[0].dataset.num_classes,
                        n_hidden=256,
-                       filters='64,64,64',
+                       filters=[64,64,64],
                        dropout=0.3,
                        adj_sq=False,
                        scale_identity=False).to('cpu')

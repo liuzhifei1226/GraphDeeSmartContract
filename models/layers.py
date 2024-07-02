@@ -99,6 +99,10 @@ class GraphSAGE(nn.Module):
 class GraphConv(nn.Module):
     def __init__(self, in_features, out_features, n_relations=1, activation=None, adj_sq=False, scale_identity=False):
         super(GraphConv, self).__init__()
+        print("in_features:", in_features)
+        print("n_relations:", n_relations)
+        print("out_features:", out_features)
+        print("in_features * n_relations:", in_features * n_relations)
         self.fc = nn.Linear(int(in_features * n_relations), int(out_features))
         self.n_relations = n_relations
         self.activation = activation

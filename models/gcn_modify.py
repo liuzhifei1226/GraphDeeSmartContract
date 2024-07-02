@@ -14,8 +14,8 @@ class GCN_MODIFY(nn.Module):
                  n_hidden=args.n_hidden, dropout=args.dropout, adj_sq=False, scale_identity=False):
         super(GCN_MODIFY, self).__init__()
         # Graph convolution layers
-        self.gconv = nn.Sequential(*([GraphConv(in_features=in_features if layer == 0 else filters[layer - 1],
-                                                out_features=f, activation=nn.ReLU(inplace=True),
+        self.gconv = nn.Sequential(*([GraphConv(in_features=int(in_features if layer == 0 else filters[layer - 1]),
+                                                out_features=int(f), activation=nn.ReLU(inplace=True),
                                                 adj_sq=adj_sq, scale_identity=scale_identity) for layer, f in enumerate(filters)]))
         # Fully connected layers
         fc = []
