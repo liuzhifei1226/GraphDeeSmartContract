@@ -14,7 +14,7 @@ print("111111111111111111111111111111111111111111")
 seed = 50
 n_folds=3
 rnd_state = np.random.RandomState(seed)
-datareader = DataReader(data_dir='./training_data/LOOP_FULLNODES_1317/', rnd_state=rnd_state,
+datareader = DataReader(data_dir='./training_data/LOOP_CORENODES_1317/', rnd_state=rnd_state,
                         use_cont_node_attr=False, folds=n_folds)
 print("Number of graphs in datareader:", datareader.N_graphs)
 
