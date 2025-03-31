@@ -48,6 +48,6 @@ def count_unique_functions_in_folder(folder_path):
 
 
 # Example usage
-folder_path = './xfuzz_contracts_unmark'
+folder_path = './pluto_contracts_unmark'
 unique_function_count = count_unique_functions_in_folder(folder_path)
 print(f'Total number of unique functions in all .sol files: {unique_function_count}')

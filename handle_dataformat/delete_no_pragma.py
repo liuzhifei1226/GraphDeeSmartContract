@@ -1,4 +1,10 @@
 import os
+import time
+
+start_time = time.time()  # 记录起始时间
+
+
+
 
 # 定义文件夹路径
 folder_path = '../dataset/xfuzz_contracts_unmark'
@@ -37,3 +43,9 @@ for file_path in files_to_delete:
         print(f"Deleted {file_path}.")
     except Exception as e:
         print(f"Error deleting {file_path}: {e}")
+
+
+end_time = time.time()  # 记录结束时间
+
+elapsed_time = end_time - start_time  # 计算时间差
+print(f"程序运行时间: {elapsed_time:.6f} 秒")
